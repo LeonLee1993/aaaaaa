@@ -1,1 +1,0 @@
-../../../SignalR-ObjC/SignalR.Client/Infrastructure/SRDeserializable.h

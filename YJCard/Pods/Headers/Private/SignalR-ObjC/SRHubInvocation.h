@@ -1,1 +1,0 @@
-../../../SignalR-ObjC/SignalR.Client/Hubs/SRHubInvocation.h

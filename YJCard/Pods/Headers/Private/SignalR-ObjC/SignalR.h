@@ -1,1 +1,0 @@
-../../../SignalR-ObjC/Framework/SignalR.h
