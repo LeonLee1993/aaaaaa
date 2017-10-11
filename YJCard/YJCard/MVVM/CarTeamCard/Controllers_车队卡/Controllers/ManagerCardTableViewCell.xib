@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ManagerCardTableViewCell" rowHeight="65" id="KGk-i7-Jjw" customClass="ManagerCardTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="374" height="65"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="374" height="64.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3ZZ-s6-RnJ">
+                        <rect key="frame" x="11" y="64" width="363" height="0.5"/>
+                        <color key="backgroundColor" red="0.92941176470588238" green="0.92941176470588238" blue="0.92941176470588238" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.5" id="78D-ME-XYL"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="卡片解绑" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Li-vS-rcF">
+                        <rect key="frame" x="10" y="23.5" width="61.5" height="18"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="更多icon" translatesAutoresizingMaskIntoConstraints="NO" id="3IW-Cu-ZJr">
+                        <rect key="frame" x="354" y="22" width="10" height="20.5"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="3IW-Cu-ZJr" secondAttribute="height" multiplier="8:16" id="aOb-fN-etQ"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="5Li-vS-rcF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="GLE-7J-D2J"/>
+                    <constraint firstItem="3IW-Cu-ZJr" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="16/50" id="J0M-tR-BJx"/>
+                    <constraint firstItem="3IW-Cu-ZJr" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="Wba-X0-b8u"/>
+                    <constraint firstAttribute="trailing" secondItem="3ZZ-s6-RnJ" secondAttribute="trailing" id="XJC-nl-ubi"/>
+                    <constraint firstAttribute="trailing" secondItem="3IW-Cu-ZJr" secondAttribute="trailing" constant="10" id="aCU-2P-yvd"/>
+                    <constraint firstItem="5Li-vS-rcF" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="asD-pS-aKe"/>
+                    <constraint firstAttribute="bottom" secondItem="3ZZ-s6-RnJ" secondAttribute="bottom" id="gMH-10-0qm"/>
+                    <constraint firstItem="3ZZ-s6-RnJ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="11" id="wiA-01-pXW"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="titleOfManager" destination="5Li-vS-rcF" id="nZp-fL-MJA"/>
+            </connections>
+            <point key="canvasLocation" x="-49" y="59.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="更多icon" width="8" height="16"/>
+    </resources>
+</document>

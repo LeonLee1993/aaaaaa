@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB" customClass="NeedCodeAndSetView">
+            <rect key="frame" x="0.0" y="0.0" width="351" height="411"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="条码二维码" translatesAutoresizingMaskIntoConstraints="NO" id="XzK-SS-Xhe">
+                    <rect key="frame" x="0.0" y="0.0" width="351" height="411"/>
+                </imageView>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="安全icon" translatesAutoresizingMaskIntoConstraints="NO" id="r3K-NU-Q7G">
+                    <rect key="frame" x="156.5" y="99.5" width="38" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="r3K-NU-Q7G" secondAttribute="height" multiplier="35.5:41" id="odS-hT-Pmf"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5T-T0-4x2">
+                    <rect key="frame" x="20" y="163.5" width="311" height="36"/>
+                    <string key="text">为了保障您的资金安全，首次使用该功能请设置支付密码</string>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mcC-PT-czv">
+                    <rect key="frame" x="94.5" y="237.5" width="162" height="38"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="mcC-PT-czv" secondAttribute="height" multiplier="150:35" id="iOU-NY-KkN"/>
+                    </constraints>
+                    <state key="normal" title="去设置">
+                        <color key="titleColor" red="0.25882352941176467" green="0.74117647058823533" blue="0.33725490196078434" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="fontSizeByScreen">
+                            <real key="value" value="0.0"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                            <real key="value" value="0.5"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" red="0.25882352941176467" green="0.74117647058823533" blue="0.44074340022467318" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="setPWClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="qBs-sj-zkZ"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="XzK-SS-Xhe" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="71j-AI-iU5"/>
+                <constraint firstItem="mcC-PT-czv" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="GkG-IB-42R"/>
+                <constraint firstItem="h5T-T0-4x2" firstAttribute="top" secondItem="r3K-NU-Q7G" secondAttribute="bottom" constant="20" id="M0V-Ee-SKe"/>
+                <constraint firstItem="h5T-T0-4x2" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="Nf4-fP-LHW"/>
+                <constraint firstItem="r3K-NU-Q7G" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="133/381" id="SlN-cX-iF7"/>
+                <constraint firstAttribute="trailing" secondItem="XzK-SS-Xhe" secondAttribute="trailing" id="Z9I-fZ-Vo8"/>
+                <constraint firstAttribute="trailing" secondItem="h5T-T0-4x2" secondAttribute="trailing" constant="20" id="ZMo-9Q-uMV"/>
+                <constraint firstItem="r3K-NU-Q7G" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="35.5/325" id="cWn-7J-9Is"/>
+                <constraint firstItem="mcC-PT-czv" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="150/325" id="ixk-35-2dV"/>
+                <constraint firstItem="r3K-NU-Q7G" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="rZr-4p-Bjx"/>
+                <constraint firstItem="mcC-PT-czv" firstAttribute="top" secondItem="h5T-T0-4x2" secondAttribute="bottom" constant="38" id="tC1-kZ-dlD"/>
+                <constraint firstAttribute="bottom" secondItem="XzK-SS-Xhe" secondAttribute="bottom" id="vdA-fP-mpU"/>
+                <constraint firstItem="XzK-SS-Xhe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="zx3-bF-9Qe"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                    <real key="value" value="5"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
+            <point key="canvasLocation" x="-359" y="355"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="安全icon" width="35" height="41"/>
+        <image name="条码二维码" width="325" height="381"/>
+    </resources>
+</document>

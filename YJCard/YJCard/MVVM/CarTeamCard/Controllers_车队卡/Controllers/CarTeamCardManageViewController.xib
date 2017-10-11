@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CarTeamCardManageViewController">
+            <connections>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ygV-GM-h9G">
+                    <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9mI-i4-SGW">
+                            <rect key="frame" x="155.5" y="11.5" width="64" height="22.5"/>
+                            <attributedString key="attributedText">
+                                <fragment content="卡片管理">
+                                    <attributes>
+                                        <font key="NSFont" size="16" name="STHeitiSC-Medium"/>
+                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                    </attributes>
+                                </fragment>
+                            </attributedString>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EgE-PT-5eg">
+                            <rect key="frame" x="315" y="0.0" width="60" height="44"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="60" id="Vfj-Tp-udy"/>
+                            </constraints>
+                            <state key="normal" image="+"/>
+                            <connections>
+                                <action selector="addCard:" destination="-1" eventType="touchUpInside" id="YKC-ry-Ul3"/>
+                            </connections>
+                        </button>
+                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TeN-rI-Jtd">
+                            <rect key="frame" x="8" y="8" width="46" height="30"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="30" id="OUX-fr-JrO"/>
+                                <constraint firstAttribute="width" constant="46" id="aje-Om-Crb"/>
+                            </constraints>
+                            <state key="normal" title="Button"/>
+                            <connections>
+                                <action selector="shareButton:" destination="-1" eventType="touchUpInside" id="j7U-SL-nfk"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="9mI-i4-SGW" firstAttribute="centerX" secondItem="ygV-GM-h9G" secondAttribute="centerX" id="7Xj-zx-zcN"/>
+                        <constraint firstAttribute="height" constant="44" id="8J4-zO-cX0"/>
+                        <constraint firstAttribute="bottom" secondItem="EgE-PT-5eg" secondAttribute="bottom" id="DG9-tw-NhI"/>
+                        <constraint firstItem="EgE-PT-5eg" firstAttribute="top" secondItem="ygV-GM-h9G" secondAttribute="top" id="ErK-Td-Sxf"/>
+                        <constraint firstAttribute="trailing" secondItem="EgE-PT-5eg" secondAttribute="trailing" id="NvN-7k-EDb"/>
+                        <constraint firstAttribute="bottom" secondItem="TeN-rI-Jtd" secondAttribute="bottom" constant="6" id="a1y-bG-1e9"/>
+                        <constraint firstItem="TeN-rI-Jtd" firstAttribute="leading" secondItem="ygV-GM-h9G" secondAttribute="leading" constant="8" id="qhH-vG-9Ob"/>
+                        <constraint firstItem="9mI-i4-SGW" firstAttribute="centerY" secondItem="ygV-GM-h9G" secondAttribute="centerY" id="rqB-D7-2QH"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="z1c-ax-t5l">
+                    <rect key="frame" x="0.0" y="64" width="375" height="0.5"/>
+                    <color key="backgroundColor" red="0.97647058823529409" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="0.5" id="KBE-On-eSt"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gHf-yh-aE7">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="20"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="gHf-yh-aE7" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="3ZD-vH-NW1"/>
+                <constraint firstAttribute="trailing" secondItem="ygV-GM-h9G" secondAttribute="trailing" id="EFy-Gu-vVB"/>
+                <constraint firstAttribute="trailing" secondItem="z1c-ax-t5l" secondAttribute="trailing" id="EpZ-ij-jpV"/>
+                <constraint firstItem="z1c-ax-t5l" firstAttribute="top" secondItem="ygV-GM-h9G" secondAttribute="bottom" id="MOS-XY-kzx"/>
+                <constraint firstItem="ygV-GM-h9G" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="Nma-MK-54S"/>
+                <constraint firstItem="z1c-ax-t5l" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="dhI-ay-rHa"/>
+                <constraint firstAttribute="trailing" secondItem="gHf-yh-aE7" secondAttribute="trailing" id="eKt-bc-rQF"/>
+                <constraint firstItem="ygV-GM-h9G" firstAttribute="top" secondItem="gHf-yh-aE7" secondAttribute="bottom" id="jho-WP-JXd"/>
+                <constraint firstItem="ygV-GM-h9G" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="20" id="k5w-yX-9hu"/>
+                <constraint firstItem="gHf-yh-aE7" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="pqz-Gc-pSM"/>
+            </constraints>
+            <point key="canvasLocation" x="-432" y="-356"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="+" width="18" height="18"/>
+    </resources>
+</document>

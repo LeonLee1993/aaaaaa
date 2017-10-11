@@ -1,0 +1,73 @@
+//
+//  GlobalHeader.pch
+//  YJCard
+//
+//  Created by 李颜成 on 2017/6/8.
+//  Copyright © 2017年 yijieguangxun. All rights reserved.
+//
+
+#ifndef GlobalHeader_h
+#define GlobalHeader_h
+
+//断点调试打印
+#ifdef DEBUG
+#define NSLog(FORMAT, ...) fprintf(stderr,"%s:%d  \t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+#else
+#define NSLog(FORMAT, ...) nil
+#endif
+
+#import <ReactiveObjC.h>
+#import <AFHTTPSessionManager.h>
+#import "MBProgressHUD+Extension.h"
+#import "UIView+LYCViewExtension.h"
+#import "UILabel+LYCTextExtension.h"
+#import "UIImage+GIF.h"
+#import "LYCRefreshHeader.h"
+#import "NSString+Extension.h"
+#import "LYCNetworkManager.h"
+#import "YJCardURLs.h"
+#import "NSObject+YYModel.h"
+#import "UIButton+myFont.h"
+#import "LYCStateViews.h"
+#import "UIImageView+WebCache.h"
+#import "LYCSignalRTool.h"
+#import "LYCLocationSigleton.h"
+#import "NSNull+LYCNullMethod.h"
+#import "LYCAlertController.h"
+#import <UMSocialCore/UMSocialCore.h>
+#import "LYCHelper.h"
+#import "UMMobClick/MobClick.h"
+
+//#import "UIButton+Extension.h"
+
+#define UserInfoKey @"userInfo"
+#define UserHeadImage @"headImgUrl"
+#define UserName @"name"
+
+#define ScreenWidth  [UIScreen mainScreen].bounds.size.width
+#define ScreenHeight [UIScreen mainScreen].bounds.size.height
+//三原色
+#define RGBColor(r,g,b) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1]
+#define RGBAColor(R,G,B,A) [UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:A]
+#define MainColor RGBColor(66,189,86)
+
+#define MainBackViewColor RGBColor(243,243,243)
+
+//系统版本
+#define IS_IOS_VERSION   floorf([[UIDevice currentDevice].systemVersion floatValue]
+
+#define IS_IOS_5    floorf([[UIDevice currentDevice].systemVersion floatValue]) ==5.0 ? 1 : 0
+
+#define IS_IOS_6    floorf([[UIDevice currentDevice].systemVersion floatValue]) ==6.0 ? 1 : 0
+//[UIDevice currentDevice] systemVersion]
+#define IS_IOS_7    floorf([[UIDevice currentDevice].systemVersion floatValue]) ==7.0 ? 1 : 0
+
+#define IS_IOS_8    floorf([[UIDevice currentDevice].systemVersion floatValue]) <=9.0 ? 1 : 0
+
+#define IS_IOS_9    floorf([[UIDevice currentDevice].systemVersion floatValue]) >=9.0 ? 1 : 0
+
+#define IS_IOS_11    floorf([[UIDevice currentDevice].systemVersion floatValue]) >=11.0 ? 1 : 0
+
+extern BOOL whetherHaveNetwork;
+
+#endif /* GlobalHeader_h */

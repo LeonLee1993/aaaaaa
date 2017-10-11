@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="LYCPoorNetworkView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="网络异常icon" translatesAutoresizingMaskIntoConstraints="NO" id="paY-vU-f8T">
+                    <rect key="frame" x="126" y="170" width="123" height="123"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="paY-vU-f8T" secondAttribute="height" multiplier="1:1" id="xkC-ps-IWV"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="网络异常，请检查网络" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NQl-H2-VHB">
+                    <rect key="frame" x="95.5" y="311" width="183.5" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AG8-Mm-kNK">
+                    <rect key="frame" x="88.5" y="367.5" width="197.5" height="42.5"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="AG8-Mm-kNK" secondAttribute="height" multiplier="197.5:42.5" id="KVN-n9-SFc"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                    <state key="normal" title="重新加载">
+                        <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="defaltBackGroudColor">
+                            <color key="value" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="reloadButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="SMi-eD-D9t"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8xO-zm-Bo2">
+                    <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="100" id="3My-ST-g3k"/>
+                        <constraint firstAttribute="height" constant="100" id="aOg-zb-BGB"/>
+                    </constraints>
+                    <state key="normal" title="Button" image="叉叉"/>
+                    <connections>
+                        <action selector="dissmissButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="tih-RG-CdW"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="NQl-H2-VHB" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="332/667" id="3Fm-LH-ur8"/>
+                <constraint firstItem="NQl-H2-VHB" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="9l6-3k-Ua1"/>
+                <constraint firstItem="8xO-zm-Bo2" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="FYS-dq-5d7"/>
+                <constraint firstItem="paY-vU-f8T" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="N1k-mH-PnK"/>
+                <constraint firstItem="AG8-Mm-kNK" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="197.5/375" id="gi9-wx-CRi"/>
+                <constraint firstItem="paY-vU-f8T" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="293/667" id="jkx-VA-by4"/>
+                <constraint firstItem="paY-vU-f8T" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="123/375" id="knh-p4-WVb"/>
+                <constraint firstItem="AG8-Mm-kNK" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="nRO-t6-5ER"/>
+                <constraint firstItem="AG8-Mm-kNK" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="410/667" id="oFF-Pb-jzI"/>
+                <constraint firstItem="8xO-zm-Bo2" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="x6t-EX-zLZ"/>
+            </constraints>
+            <point key="canvasLocation" x="34" y="39"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="叉叉" width="13" height="13"/>
+        <image name="网络异常icon" width="123" height="123"/>
+    </resources>
+</document>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="ScanCodeTopView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kB5-zW-hwd" customClass="GlobelGoBackButton">
+                    <rect key="frame" x="0.0" y="0.0" width="80" height="49"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="80" id="Bhe-AB-svQ"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                    <state key="normal" title="首页" image="返回icon">
+                        <color key="titleColor" red="0.99607843137254903" green="0.99607843137254903" blue="0.99607843137254903" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="fontSizeByScreen">
+                            <real key="value" value="13"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Uz3-bX-3wn">
+                    <rect key="frame" x="331" y="0.0" width="44" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="jWZ-9D-Vtc"/>
+                        <constraint firstAttribute="width" constant="44" id="lbe-kD-Mjs"/>
+                    </constraints>
+                    <state key="normal" image="手电筒关"/>
+                    <state key="selected" image="手电筒开"/>
+                    <connections>
+                        <action selector="diantong:" destination="iN0-l3-epB" eventType="touchUpInside" id="KiE-Rn-uK6"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="Uz3-bX-3wn" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="aDH-QS-ocw"/>
+                <constraint firstItem="kB5-zW-hwd" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="b1Y-al-D81"/>
+                <constraint firstItem="kB5-zW-hwd" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="cCB-Wi-82C"/>
+                <constraint firstItem="kB5-zW-hwd" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="dmz-pX-q4f"/>
+                <constraint firstAttribute="bottom" secondItem="kB5-zW-hwd" secondAttribute="bottom" id="gsC-po-aef"/>
+                <constraint firstAttribute="trailing" secondItem="Uz3-bX-3wn" secondAttribute="trailing" id="mDf-uL-Vb6"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="goBack" destination="kB5-zW-hwd" id="g18-K2-ZKJ"/>
+            </connections>
+            <point key="canvasLocation" x="-232" y="233"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="手电筒关" width="14" height="18"/>
+        <image name="手电筒开" width="14" height="18"/>
+        <image name="返回icon" width="6" height="12"/>
+    </resources>
+</document>
