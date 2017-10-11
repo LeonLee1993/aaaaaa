@@ -1,0 +1,297 @@
+//
+//  HDShareCustom.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/12/19.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDShareCustom.h"
+//shareSDK
+#import <ShareSDK/ShareSDK.h>
+#import <ShareSDKConnector/ShareSDKConnector.h>
+
+//腾讯开放平台（对应QQ和QQ空间）SDK头文件
+#import <TencentOpenAPI/TencentOAuth.h>
+#import <TencentOpenAPI/QQApiInterface.h>
+
+//微信SDK头文件
+#import "WXApi.h"
+
+//新浪微博SDK头文件
+#import "WeiboSDK.h"
+
+#define shareBlakBgViewAlpha 0.3
+
+@interface HDShareCustom(){
+    int shareType;
+}
+@end
+
+@implementation HDShareCustom
+
+static id _publishContent;//类方法中的全局变量这样用（类型前面加static）
+static UIVisualEffectView * _effectView;
+static UIView * _shareBlakBgView;
+static UIView * _shareBgView;
+
++ (void) registShareSDK {
+    /**
+     *  设置ShareSDK的appKey，如果尚未在ShareSDK官网注册过App，请移步到http://mob.com/login 登录后台进行应用注册
+     *  在将生成的AppKey传入到此方法中。
+     *  方法中的第二个第三个参数为需要连接社交平台SDK时触发，
+     *  在此事件中写入连接代码。第四个参数则为配置本地社交平台时触发，根据返回的平台类型来配置平台信息。
+     *  如果您使用的时服务端托管平台信息时，第二、四项参数可以传入nil，第三项参数则根据服务端托管平台来决定要连接的社交SDK。
+     */
+    [ShareSDK registerApp:SHARE_APPKEY
+     
+          activePlatforms:@[
+                            @(SSDKPlatformTypeSinaWeibo),
+                            @(SSDKPlatformTypeWechat),
+                            @(SSDKPlatformTypeQQ)]
+                 onImport:^(SSDKPlatformType platformType)
+     {
+         switch (platformType)
+         {
+             case SSDKPlatformTypeWechat:
+                 [ShareSDKConnector connectWeChat:[WXApi class]];
+                 break;
+             case SSDKPlatformTypeQQ:
+                 [ShareSDKConnector connectQQ:[QQApiInterface class] tencentOAuthClass:[TencentOAuth class]];
+                 break;
+             case SSDKPlatformTypeSinaWeibo:
+                 [ShareSDKConnector connectWeibo:[WeiboSDK class]];
+                 break;
+             default:
+                 break;
+         }
+     }
+          onConfiguration:^(SSDKPlatformType platformType, NSMutableDictionary *appInfo)
+     {
+         
+         switch (platformType)
+         {
+             case SSDKPlatformTypeSinaWeibo:
+                 //设置新浪微博应用信息,其中authType设置为使用SSO＋Web形式授权
+                 [appInfo SSDKSetupSinaWeiboByAppKey:@"2150087076"
+                                           appSecret:@"fff114df6427749e222765c873c013ef"
+                                         redirectUri:@"http://open.weibo.com/apps/2150087076/privilege/oauth"
+                                            authType:SSDKAuthTypeBoth];
+                 break;
+             case SSDKPlatformTypeWechat:
+                 [appInfo SSDKSetupWeChatByAppId:@"wx817e33d58fcd8194"
+                                       appSecret:@"a6a6d463da5fea19cb7d9ba38f2ef75d"];
+                 break;
+             case SSDKPlatformTypeQQ:
+                 [appInfo SSDKSetupQQByAppId:@"1105894722"
+                                      appKey:@"ifc3705adGcEsbrd"
+                                    authType:SSDKAuthTypeBoth];
+                 break;
+             default:
+                 break;
+         }
+     }];
+}
+/*只需要在分享按钮事件中 构建好分享内容publishContent传过来就好了*/
+//-(void)shareWithContent:(id)publishContent
+-(void)createShareUI
+{
+
+    if (_isHasCreatedShareUIBool) {
+        [self addUI];
+    }else {
+        NSArray * shareIconArr = @[imageNamed(@"share_weixin"),imageNamed(@"share_friendCircle"),imageNamed(@"share_weibo"),imageNamed(@"share_QQ")];
+        
+        NSArray * shareTitleArr = @[@"微信好友",@"微信朋友圈",@"新浪微博",@"QQ"];
+        //    _publishContent = publishContent;
+        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        //分享黑色背景视图
+        _shareBlakBgView = [[UIView alloc] initWithFrame:CGRM(0, 0, SCREEN_SIZE_WIDTH, SCREEN_SIZE_HEIGHT)];
+        _shareBlakBgView.backgroundColor = UICOLOR(28, 28, 28, 1);
+        _shareBlakBgView.alpha = shareBlakBgViewAlpha;
+        _shareBlakBgView.tag = 8800;
+        
+        UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(shareBlakBgViewTapEvent:)];
+        [_shareBlakBgView addGestureRecognizer:tap];
+        [window addSubview:_shareBlakBgView];
+        
+        //分享白色背景视图
+        _shareBgView = [[UIView alloc] initWithFrame:CGRM(0, 0, SCREEN_SIZE_WIDTH, 73)];
+        _shareBgView.backgroundColor = COLOR(whiteColor);
+        _shareBgView.tag = 8900;
+        [window addSubview:_shareBgView];
+        
+        
+        //分享按钮
+        for (int i = 0; i < shareTitleArr.count; i++) {
+            //icon
+            UIImageView * shareIMV = [[UIImageView alloc] init];
+            shareIMV.image = shareIconArr[i];
+            shareIMV.tag = 920+i;
+            [_shareBgView addSubview:shareIMV];
+            //title
+            UILabel * title = [ZHFactory createLabelWithFrame:CGRectZero andFont:systemFont(9) andTitleColor:TEXT_COLOR title:shareTitleArr[i]];
+            title.tag = 940+i;
+            title.textAlignment = NSTextAlignmentCenter;
+            [_shareBgView addSubview:title];
+            
+            if (i > 0) {
+                UIView * lineView = [UIView new];
+                lineView.backgroundColor = LINE_COLOR;
+                lineView.tag = 960+i;
+                [_shareBgView addSubview:lineView];
+            }
+            
+            UIButton * shareBtn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+            shareBtn.tag = 900+i;
+            [shareBtn addTarget:self action:@selector(shareBtnClicked:) forControlEvents:(UIControlEventTouchUpInside)];
+            [_shareBgView addSubview:shareBtn];
+        }
+        [self adjustFrameWithtitleArr:shareTitleArr];
+        self.isHasCreatedShareUIBool = YES;
+    }
+    self.isClosedShareUIBool = NO;
+    
+}
+- (void) adjustFrameWithtitleArr:(NSArray *)shareTitleArr {
+    CGFloat shuxianWidth = 1;
+    CGFloat sectionWidth = (SCREEN_SIZE_WIDTH-shuxianWidth*(shareTitleArr.count-1))/shareTitleArr.count;
+    CGFloat iconIMVHeight = 24.0;//分享图标高度
+    
+    _shareBlakBgView.frame = CGRM(0, 0, SCREEN_SIZE_WIDTH, SCREEN_SIZE_HEIGHT);
+    _shareBgView.frame = CGRM(0, SCREEN_HEIGHT-73, SCREEN_SIZE_WIDTH, 73);
+    
+    for (int i = 0; i < shareTitleArr.count; i++) {
+        CGFloat iconIMVWidth = 30.0;//分享图标宽度
+        if (i == 1) {
+            iconIMVWidth = 25.0;
+        }else if (i== 3) {
+            iconIMVWidth = 23.0;
+        }
+        
+        UIImageView * imv = (UIImageView*)[_shareBgView viewWithTag:920+i];
+        imv.frame = CGRM((sectionWidth+shuxianWidth)*i+(sectionWidth/2.0-iconIMVWidth/2.0),_shareBgView.height/2-iconIMVWidth*2/3, i == 3? 23:iconIMVWidth, iconIMVHeight);
+        
+        UILabel * thyTitle = (UILabel*)[_shareBgView viewWithTag:940+i];
+        thyTitle.frame = CGRM((sectionWidth+shuxianWidth)*i, CGMAX_Y(imv.frame)+10, sectionWidth, 10);
+        
+        UIView * lineview = (UIView*)[_shareBgView viewWithTag:960+i];
+        lineview.frame = CGRM(sectionWidth*i, CGMIN_Y(imv.frame), shuxianWidth, CGMAX_Y(thyTitle.frame)-CGMIN_Y(imv.frame));
+        
+        UIButton * btn = (UIButton*)[_shareBgView viewWithTag:900+i];
+        btn.frame = CGRM((sectionWidth+shuxianWidth)*i, 0, sectionWidth, _shareBgView.height);
+    }
+}
+- (void)shareBlakBgViewTapEvent:(UITapGestureRecognizer *)tap {
+    [self dismiss];
+    if ([self shareCustomDlegate] && [[self shareCustomDlegate] respondsToSelector:@selector(shareBlcakBgViewTaped)]) {
+        [[self shareCustomDlegate] shareBlcakBgViewTaped];
+    }
+}
+
+- (void) shareBtnClicked:(UIButton*)sender {
+    
+    [self dismiss];
+    if (self.comFromIndex == 0 && self.shareCustomDlegate && [self.shareCustomDlegate respondsToSelector:@selector(shareCustomShareBtnClicked)]) {
+        [self.shareCustomDlegate shareCustomShareBtnClicked];
+    }
+    
+    shareType = 0;
+    switch (sender.tag) {
+        case 900:
+        {//微信好友
+            shareType = SSDKPlatformSubTypeWechatSession;
+            NSLog(@" 微信好友");
+        }
+            break;
+            
+        case 901:
+        {//微信朋友圈
+            shareType = SSDKPlatformSubTypeWechatTimeline;
+            NSLog(@" 微信朋友圈");
+        }
+            break;
+            
+        case 902:
+        {//新浪微博
+            shareType = SSDKPlatformTypeSinaWeibo ;
+            NSLog(@" 新浪微博");
+        }
+            break;
+            
+        case 903:
+        {//QQ好友
+            shareType = SSDKPlatformSubTypeQQFriend;
+            NSLog(@" QQ好友");
+        }
+            break;
+                         
+        default:
+            break;
+    }
+    
+    BOOL isCanOpenWXBool = false;
+    BOOL isCanOpenQQBool = false;
+    BOOL isSinaWeiBoBool = false;
+    
+    if (sender.tag == 900 || sender.tag == 901)
+    {//微信
+        // 检测是否安装了微信
+        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"weixin://"]]) {
+            
+            isCanOpenWXBool = YES;
+            if (self.sharePlatBlock) {
+                self.sharePlatBlock(sender.tag-900);
+            }
+        }else {
+            isCanOpenWXBool = NO;
+            if (self.isInstalledAlertBlock) {
+                self.isInstalledAlertBlock(@"没有安装微信");
+            }
+        }
+    }else if (sender.tag == 903)
+    {//QQ
+        //判断是否安装了QQ
+        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"mqq://"]]) {
+            isCanOpenQQBool = YES;
+            if (self.sharePlatBlock) {
+                self.sharePlatBlock(sender.tag-900);
+            }
+        }else {
+            isCanOpenQQBool = NO;
+            if (self.isInstalledAlertBlock) {
+                self.isInstalledAlertBlock(@"没有安装QQ");
+            }
+        }
+    }else
+    {//微博
+        isSinaWeiBoBool = YES;
+        if (self.sharePlatBlock) {
+            self.sharePlatBlock(sender.tag-900);
+        }
+    }
+}
+- (void) gotoShareWithContent:(id)publishContent {
+    //调用shareSDK的无UI分享类型
+    WEAK_SELF;
+    [ShareSDK share:shareType parameters:publishContent onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
+        STRONG_SELF;
+
+        if (strongSelf.shareStatusBlock) {
+            strongSelf.shareStatusBlock(state);
+        }
+    }];
+}
+- (void)dismiss {
+    [_shareBlakBgView removeFromSuperview];
+    [_shareBgView removeFromSuperview];
+    self.isClosedShareUIBool = YES;
+}
+
+- (void) addUI {
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    [window addSubview:_shareBlakBgView];
+    [window addSubview:_shareBgView];
+}
+
+@end

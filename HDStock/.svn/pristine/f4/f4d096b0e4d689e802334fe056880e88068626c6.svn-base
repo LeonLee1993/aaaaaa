@@ -1,0 +1,35 @@
+//
+//  nothingContainView.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/26.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "nothingContainView.h"
+
+@implementation nothingContainView
+
++ (void)show
+{
+    // 设置父控件的透明度会影响子控件
+    
+    nothingContainView *cover = [[nothingContainView alloc] initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT-64)];
+    cover.backgroundColor = [UIColor blackColor];
+    cover.alpha = 1;
+    [[UIApplication sharedApplication].keyWindow addSubview:cover];
+    
+}
+
++ (void)hide
+{
+    for (UIView *childView in [UIApplication sharedApplication].keyWindow.subviews) {
+        if ([childView isKindOfClass:self]) {
+            [childView removeFromSuperview];
+        }
+    }
+}
+
+
+
+@end

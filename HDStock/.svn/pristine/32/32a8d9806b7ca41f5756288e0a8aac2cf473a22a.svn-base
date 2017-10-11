@@ -1,0 +1,128 @@
+//
+//  HDHeadLineModel.m
+//  HDGolden
+//
+//  Created by hd-app02 on 16/10/19.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDHeadLineModel.h"
+
+@implementation HDHeadLineModel
+
+- (CGFloat)cellHeight{
+    
+    if (!_cellHeight) {
+        
+        CGFloat screenW = [UIScreen mainScreen].bounds.size.width - 16;
+        
+        CGFloat contentW = [self.title sizeWithAttributes:@{NSFontAttributeName :[UIFont systemFontOfSize:18]}].width;
+
+    if(self.pic.length > 1){
+        
+        if (!self.countmanypic) {
+            
+            return 106;
+            
+        }
+        if (self.countmanypic) {
+            
+            if (self.countmanypic == 1) {
+                
+                return 106;
+                
+            }else if (self.countmanypic == 2){
+                
+                if (contentW > screenW) {
+                    
+                    _cellHeight = 281;
+                    
+                }else{
+                    
+                    _cellHeight = 261;
+                    
+                }
+                
+            }else if (self.countmanypic == 3){
+                
+                if (contentW > screenW) {
+                    
+                    _cellHeight = 186;
+                    
+                }else{
+                    
+                    _cellHeight = 167;
+                    
+                }
+            
+            }
+        }
+    }
+    if (self.pic.length == 0) {
+        
+        if (!self.countmanypic) {
+            
+            if (contentW > screenW) {
+                
+                _cellHeight = 98;
+                
+            }else{
+            
+                _cellHeight = 78;
+                
+            }
+        }
+        
+        if (self.countmanypic) {
+            if (self.countmanypic == 1) {
+                
+                return  106;
+                
+            }else if (self.countmanypic == 2){
+                
+                if (contentW > screenW) {
+                    
+                    _cellHeight = 281;
+                    
+                }else{
+                    
+                    _cellHeight = 261;
+                    
+                }
+                
+            }else if (self.countmanypic == 3){
+                
+                if (contentW > screenW) {
+                    
+                    _cellHeight = 186;
+                    
+                }else{
+                    
+                    _cellHeight = 167;
+                    
+                }
+                
+            }
+        }
+    }
+    }
+    
+    return _cellHeight;
+}
+
+-(NSString *)tagText{
+
+    if (!_tagText) {
+        
+        _tagText = self.tags_name[@"6"];
+        
+    }
+
+    return _tagText;
+
+}
+    
+
+
+
+@end

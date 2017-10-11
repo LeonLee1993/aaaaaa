@@ -1,0 +1,56 @@
+//
+//  HDStockSayingTableViewCell.m
+//  HDStock
+//
+//  Created by hd-app02 on 2016/12/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDStockSayingTableViewCell.h"
+
+@interface HDStockSayingTableViewCell()
+
+@property (nonatomic, assign) CGFloat localProgress;
+
+@end
+
+@implementation HDStockSayingTableViewCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+    self.progressView.fillOnTouch = NO;
+    self.progressView.centralView = self.playButton;
+    [self.playButton addTarget:self action:@selector(playButtonOnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    self.progressView.lineWidth = 3;
+    self.progressView.borderWidth = 0;
+    self.progressView.tintColor = MAIN_COLOR;
+    
+    [NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(updateProgress:) userInfo:nil repeats:YES];
+    
+}
+
+- (void)updateProgress:(NSTimer *)timer {
+    _localProgress = ((int)((_localProgress * 100.0f) + 1.01) % 100) / 100.0f;
+    
+    [self.progressView setProgress:_localProgress];
+    //	[self.progressView6 setProgress:_localProgress]; // 6 is done on tap
+}
+
+
+- (void)playButtonOnClicked:(UIButton *)button{
+    
+    NSLog(@"按钮点击");
+
+    button.selected = !button.selected;
+
+
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

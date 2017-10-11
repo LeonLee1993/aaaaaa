@@ -1,0 +1,42 @@
+//
+//  HDLiveTableViewCell.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/11/17.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDLiveTableViewCell.h"
+
+@implementation HDLiveTableViewCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+//    NSArray * arr = @[@" 计算机 ",@" 互动多 ",@" 短线 "];
+//    
+//    for (int i = 0; i < arr.count; i++) {
+//        CGSize tempSize = [arr[i] sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13]}];
+//        CGSize tempNextSize;
+//        if (i < arr.count-1) {
+//            if (i > 0) {
+//                tempNextSize = [arr[i+1] sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13]}];
+//            }
+//        }
+//        UILabel * labe = [ZHFactory createLabelWithFrame:CGRM(90+(tempNextSize.width+5)*i, 30+8, 50, 20) andFont:[UIFont systemFontOfSize:13] andTitleColor:[UIColor lightGrayColor] title:arr[i]];
+//        labe.layer.cornerRadius = tempSize.height/2;
+//        labe.layer.masksToBounds = YES;
+//        labe.layer.borderWidth = 1;
+//        labe.layer.borderColor = [UIColor lightGrayColor].CGColor;
+//        labe.backgroundColor = COLOR(redColor);
+//        [self.bgView addSubview:labe];
+//    }
+
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

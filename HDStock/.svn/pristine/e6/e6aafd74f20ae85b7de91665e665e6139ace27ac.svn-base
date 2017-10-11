@@ -1,0 +1,77 @@
+//
+//  HDStockURLHeader.h
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#ifndef HDStockURLHeader_h
+#define HDStockURLHeader_h
+
+//域名
+#define HDBaseURL @"http://test.cdtzb.com/"
+
+/***********************************    首页    ***************************/
+//资讯列表
+#define Home_HeadLineCateNews [HDBaseURL stringByAppendingString:@"api.php?mod=hd&type=list&page=%ld&perpage=%ld&catid=%ld&time=%u"]
+//文章详情
+#define NewsDetails [HDBaseURL stringByAppendingString:@"api.php?mod=hd&type=detail&aid=%ld&time=%u"]
+//广告
+#define Advertisement [HDBaseURL stringByAppendingString:@"api.php?mod=adv&operation=ad&type=custom&customid=1"]
+
+/********************************************  行情  **********************/
+
+/********************************************  资讯  ***********************/
+//评论列表
+#define NewsComments [HDBaseURL stringByAppendingString:@"api.php?mod=hd&type=comment&aid=%ld&page=%ld&perpage=%ld&time=%u"]
+//发布评论
+#define CommentsPost [HDBaseURL stringByAppendingString:@"api.php?mod=hd&type=point_comment"]
+//收藏
+#define CollectionTheArticle [HDBaseURL stringByAppendingString:@"api.php?mod=spacecp&op=add&ac=favorite&type=article&id=%ld&handlekey=favoritearticlehk_%ld&time=%u"]
+//取消收藏
+#define CancelCollection [HDBaseURL stringByAppendingString:@"api.php?mod=spacecp&ac=favorite&op=delete&favid=%ld&time=%u"]
+//评论点赞
+#define PraiseComment [HDBaseURL stringByAppendingString:@"api.php?mod=hd&type=point_comment&cid=%ld&time=%u"]
+//文章点赞
+#define PraiseArticle [HDBaseURL stringByAppendingString:@"api.php?mod=hd&type=click&idtype=aid&id=%ld&clickid=1&hash=%@&handlekey=clickhandle&time=%u"]
+
+/********************************************  直播  ***********************/
+/**直播列表*/
+#define LIVEROOM_LIST_URL [HDBaseURL stringByAppendingString:@"liveroom.php?"]
+//#define LIVEROOM_LIST_URL @"http://test.cdtzb.com/liveroom.php?mod=public&act=room_list&ajax=1"
+/**直播室历史列表*/
+#define LIVEROOM_HISTORY_URL @"liveroom.php?mod=public&act=room_history&room_id=100001"
+/**直播室历史列表*/
+#define LIVEROOM_HISTORY_DETAIL_URL @"liveroom.php?mod=text&type=live_history&belong_room=100001&y=2016&m=12&d=8&page=1&size=10"
+
+/**直列表-关注*/
+#define LIVEROOM_LIST_CARE_URL @"api_user.php?mod=follow&act=add"
+
+/**直列表-取消关注*/
+#define LIVEROOM_LIST_CANCELLE_CARE_URL @"api_user.php?mod=follow&act=del"
+
+
+
+#define globleURL_prefix @"http://test.cdtzb.com/"
+
+//注册
+//#define resignStr @"http://test.cdtzb.com/api.php?mod=member&act=register_mobile"
+#define resignStr @"http://gk.cdtzb.com/api/gbs/add"
+//登录
+//#define loginStr @"http://test.cdtzb.com/api.php?mod=member&act=login"
+#define loginStr @"http://gk.cdtzb.com/api/gbs/login"
+//获得头像
+//http://test.cdtzb.com/api.php?mod=member&act=uploadavatar&type=get_head_pic
+#define getAvatar @"http://gk.cdtzb.com/api/member/get_head_pic&token="
+//获得用户信息http://test.cdtzb.com/api.php?mod=member&act=profile&method=info
+#define getInformationStr  @"http://gk.cdtzb.com/api/member/get_user_info"
+
+#define URL_ChangePW @"api.php?mod=member&act=info&method=password"
+//获取验证码
+#define getCode @"http://test.cdtzb.com/api.php?mod=member&act=note&mobile=%@&type=%@&test=1%d"
+//修改名字
+#define changedName @"http://test.cdtzb.com/api.php?mod=member&act=profile&method=set_nickname"
+
+
+#endif /* HDStockURLHeader_h */

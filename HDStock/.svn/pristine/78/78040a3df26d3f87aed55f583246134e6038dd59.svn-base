@@ -1,0 +1,40 @@
+//
+//  DataModel.h
+//
+//  http://www.cnblogs.com/YouXianMing/
+//  https://github.com/YouXianMing
+//
+//  Copyright (c) YouXianMing All rights reserved.
+//
+
+
+#import <Foundation/Foundation.h>
+
+@interface MyCollectedDataModel : NSObject
+
+@property (nonatomic, strong) NSString *id;
+@property (nonatomic, strong) NSString *Desc;
+@property (nonatomic, strong) NSString *catename;
+@property (nonatomic, strong) NSString *uid;
+@property (nonatomic, strong) NSString *author;
+@property (nonatomic, strong) NSString *spaceuid;
+@property (nonatomic, strong) NSString *from;
+@property (nonatomic, strong) NSString *fromurl;
+@property (nonatomic, strong) NSString *pic;
+@property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSString *dateline;
+@property (nonatomic, strong) NSString *idtype;
+@property (nonatomic, strong) NSString *favid;
+@property (nonatomic, strong) NSNumber *countmanypic;
+
+/**
+ *  Init the model with dictionary
+ *
+ *  @param dictionary dictionary
+ *
+ *  @return model
+ */
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
+
+@end
+

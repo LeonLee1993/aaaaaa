@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1212" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="KeyBoardView">
+            <rect key="frame" x="0.0" y="0.0" width="419" height="177"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cQe-RC-LHi" customClass="keyBoardViewButton">
+                    <rect key="frame" x="90.5" y="9" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="1">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="XG5-eB-E7G"/>
+                    </connections>
+                </button>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4wk-WO-pec">
+                    <rect key="frame" x="9" y="9" width="75" height="160"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0UH-GE-vt3">
+                            <rect key="frame" x="0.0" y="0.0" width="75" height="32"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="600">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="leftNumberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="nqp-sD-5Hi"/>
+                            </connections>
+                        </button>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sHT-4F-LGq">
+                            <rect key="frame" x="6" y="32" width="63" height="1"/>
+                            <color key="backgroundColor" red="0.8666666666666667" green="0.8666666666666667" blue="0.8666666666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="1" id="H44-AV-57h"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KCR-Ol-u37">
+                            <rect key="frame" x="6" y="97" width="63" height="1"/>
+                            <color key="backgroundColor" red="0.86666666670000003" green="0.86666666670000003" blue="0.86666666670000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="1" id="oEP-7X-yVV"/>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="1" id="s6I-HC-9N0"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VJJ-1P-DZN">
+                            <rect key="frame" x="6" y="130" width="63" height="1"/>
+                            <color key="backgroundColor" red="0.86666666670000003" green="0.86666666670000003" blue="0.86666666670000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="1" id="991-sd-lDD"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nL3-OJ-s53">
+                            <rect key="frame" x="6" y="64" width="63" height="1"/>
+                            <color key="backgroundColor" red="0.86666666670000003" green="0.86666666670000003" blue="0.86666666670000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="1" id="0fC-Ar-hxf"/>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="1" id="NeI-7a-mFa"/>
+                            </constraints>
+                        </view>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dKM-3Z-Ntw" customClass="keyBoardViewButton">
+                            <rect key="frame" x="0.0" y="32" width="75" height="32"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="601">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="leftNumberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="jyN-Pc-WKM"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2cO-IB-xfP" customClass="keyBoardViewButton">
+                            <rect key="frame" x="0.0" y="65" width="75" height="32"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="000">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="leftNumberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="RqM-no-edd"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Apo-ie-DZg" customClass="keyBoardViewButton">
+                            <rect key="frame" x="0.0" y="98" width="75" height="32"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="300">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="leftNumberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="3Ko-oo-ynY"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gHG-47-Izp" customClass="keyBoardViewButton">
+                            <rect key="frame" x="0.0" y="130" width="75" height="32"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="002">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="leftNumberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="frV-c8-bbR"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" red="0.73333333333333328" green="0.73333333333333328" blue="0.73333333333333328" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="0UH-GE-vt3" firstAttribute="height" secondItem="4wk-WO-pec" secondAttribute="height" multiplier="1/5" id="0Gc-JK-biP"/>
+                        <constraint firstItem="Apo-ie-DZg" firstAttribute="width" secondItem="2cO-IB-xfP" secondAttribute="width" id="1MD-09-94m"/>
+                        <constraint firstItem="Apo-ie-DZg" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" id="40r-RR-2IT"/>
+                        <constraint firstItem="sHT-4F-LGq" firstAttribute="top" secondItem="0UH-GE-vt3" secondAttribute="bottom" id="9UO-fm-BNt"/>
+                        <constraint firstItem="Apo-ie-DZg" firstAttribute="top" secondItem="KCR-Ol-u37" secondAttribute="bottom" id="E2S-OD-ANm"/>
+                        <constraint firstItem="2cO-IB-xfP" firstAttribute="height" secondItem="dKM-3Z-Ntw" secondAttribute="height" id="H0K-ig-4cB"/>
+                        <constraint firstItem="dKM-3Z-Ntw" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" id="Led-p2-hGw"/>
+                        <constraint firstItem="gHG-47-Izp" firstAttribute="top" secondItem="Apo-ie-DZg" secondAttribute="bottom" id="N4P-sq-Yii"/>
+                        <constraint firstAttribute="trailing" secondItem="VJJ-1P-DZN" secondAttribute="trailing" constant="6" id="NCc-TQ-vQk"/>
+                        <constraint firstItem="2cO-IB-xfP" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" id="PdC-6v-Qas"/>
+                        <constraint firstItem="VJJ-1P-DZN" firstAttribute="top" secondItem="Apo-ie-DZg" secondAttribute="bottom" id="UaZ-ei-SNx"/>
+                        <constraint firstItem="KCR-Ol-u37" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" constant="6" id="Xoh-Za-JFy"/>
+                        <constraint firstItem="sHT-4F-LGq" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" constant="6" id="XrU-JX-RyV"/>
+                        <constraint firstItem="nL3-OJ-s53" firstAttribute="top" secondItem="dKM-3Z-Ntw" secondAttribute="bottom" id="YbU-lr-wSZ"/>
+                        <constraint firstItem="dKM-3Z-Ntw" firstAttribute="width" secondItem="0UH-GE-vt3" secondAttribute="width" id="ZdT-NQ-5Sl"/>
+                        <constraint firstAttribute="trailing" secondItem="nL3-OJ-s53" secondAttribute="trailing" constant="6" id="ZsI-Fq-Jf4"/>
+                        <constraint firstItem="2cO-IB-xfP" firstAttribute="width" secondItem="dKM-3Z-Ntw" secondAttribute="width" id="afK-7k-d0I"/>
+                        <constraint firstItem="gHG-47-Izp" firstAttribute="height" secondItem="Apo-ie-DZg" secondAttribute="height" id="av4-U5-hIN"/>
+                        <constraint firstItem="dKM-3Z-Ntw" firstAttribute="top" secondItem="0UH-GE-vt3" secondAttribute="bottom" id="f3u-y3-Xfj"/>
+                        <constraint firstItem="Apo-ie-DZg" firstAttribute="height" secondItem="2cO-IB-xfP" secondAttribute="height" id="f5O-nU-yYj"/>
+                        <constraint firstItem="0UH-GE-vt3" firstAttribute="width" secondItem="4wk-WO-pec" secondAttribute="width" id="fd5-AU-dR8"/>
+                        <constraint firstItem="0UH-GE-vt3" firstAttribute="top" secondItem="4wk-WO-pec" secondAttribute="top" id="hSt-Ir-dbO"/>
+                        <constraint firstItem="dKM-3Z-Ntw" firstAttribute="height" secondItem="0UH-GE-vt3" secondAttribute="height" id="hcO-Yv-zqr"/>
+                        <constraint firstItem="2cO-IB-xfP" firstAttribute="top" secondItem="nL3-OJ-s53" secondAttribute="bottom" id="hgX-Nc-OqF"/>
+                        <constraint firstItem="nL3-OJ-s53" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" constant="6" id="nGA-bF-sVM"/>
+                        <constraint firstAttribute="trailing" secondItem="KCR-Ol-u37" secondAttribute="trailing" constant="6" id="nbV-di-h38"/>
+                        <constraint firstItem="KCR-Ol-u37" firstAttribute="top" secondItem="2cO-IB-xfP" secondAttribute="bottom" id="oC9-R4-vsJ"/>
+                        <constraint firstItem="0UH-GE-vt3" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" id="rQt-BE-8DJ"/>
+                        <constraint firstItem="gHG-47-Izp" firstAttribute="width" secondItem="Apo-ie-DZg" secondAttribute="width" id="rbG-zH-Z1j"/>
+                        <constraint firstItem="VJJ-1P-DZN" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" constant="6" id="rmA-HZ-WeO"/>
+                        <constraint firstAttribute="trailing" secondItem="sHT-4F-LGq" secondAttribute="trailing" constant="6" id="z43-B0-Hph"/>
+                        <constraint firstItem="gHG-47-Izp" firstAttribute="leading" secondItem="4wk-WO-pec" secondAttribute="leading" id="zti-qZ-iMJ"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tPm-Tx-inM" customClass="keyBoardViewButton">
+                    <rect key="frame" x="90.5" y="49.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="4">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="ALC-Cg-Uib"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vuQ-C1-2aC" customClass="keyBoardViewButton">
+                    <rect key="frame" x="172" y="9" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="2">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="yn4-gp-gbt"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xPL-ed-sdl" customClass="keyBoardViewButton">
+                    <rect key="frame" x="253.5" y="9" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="3">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="vx0-Qh-ufi"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eI9-xc-5Rg" customClass="keyBoardViewButton">
+                    <rect key="frame" x="253.5" y="49.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="6">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="EmI-uy-eBo"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vBe-6i-cJv" customClass="keyBoardViewButton">
+                    <rect key="frame" x="90.5" y="90.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="7">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="v0F-TF-FJI"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gqc-09-VaZ" customClass="keyBoardViewButton">
+                    <rect key="frame" x="172" y="90.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="8">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="CZA-SL-ODX"/>
+                    </connections>
+                </button>
+                <button opaque="NO" tag="206" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kCO-cp-UNz" customClass="keyBoardViewButton">
+                    <rect key="frame" x="172" y="131.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="0.73333333333333328" green="0.73333333333333328" blue="0.73333333333333328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="中文">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="chineseClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="m2S-Jd-gXQ"/>
+                    </connections>
+                </button>
+                <button opaque="NO" tag="205" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="a84-kv-bz1" customClass="keyBoardViewButton">
+                    <rect key="frame" x="90.5" y="131.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="0.73333333333333328" green="0.73333333333333328" blue="0.73333333333333328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="ABC">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="ABCClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="3Ba-0H-91t"/>
+                    </connections>
+                </button>
+                <button opaque="NO" tag="202" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KFu-Mh-ZzK" customClass="keyBoardViewButton">
+                    <rect key="frame" x="335" y="49.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="0.73333333333333328" green="0.73333333333333328" blue="0.73333333333333328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="隐藏">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="hideButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="hLs-3v-BLK"/>
+                    </connections>
+                </button>
+                <button opaque="NO" tag="203" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5db-4P-tZb" customClass="keyBoardViewButton">
+                    <rect key="frame" x="335" y="90.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="0.73333333333333328" green="0.73333333333333328" blue="0.73333333333333328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="清空">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="clearButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="WkB-uc-dvr"/>
+                    </connections>
+                </button>
+                <button opaque="NO" tag="204" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2nQ-dP-HjY" customClass="keyBoardViewButton">
+                    <rect key="frame" x="335" y="131.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="0.73333333333333328" green="0.73333333333333328" blue="0.73333333333333328" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="确定">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="certenButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="12g-EI-H63"/>
+                    </connections>
+                </button>
+                <button opaque="NO" tag="201" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="znQ-Gb-oh7" customClass="keyBoardViewButton">
+                    <rect key="frame" x="335" y="9" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" backgroundImage="delete_button">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="deleteOneButtonClick:" destination="iN0-l3-epB" eventType="touchUpInside" id="wwd-rg-VjU"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wj6-8J-SKm" customClass="keyBoardViewButton">
+                    <rect key="frame" x="253.5" y="90.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="9">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="Cax-5m-6EM"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WpO-lN-r9t" customClass="keyBoardViewButton">
+                    <rect key="frame" x="253.5" y="131.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="0">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="coT-jl-nLq"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Qr-kq-Qch" customClass="keyBoardViewButton">
+                    <rect key="frame" x="172" y="49.5" width="75" height="37.5"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="5">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="numberButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="BaO-Kl-0oP"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.8666666666666667" green="0.8666666666666667" blue="0.8666666666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="a84-kv-bz1" firstAttribute="height" secondItem="vBe-6i-cJv" secondAttribute="height" id="1WD-Va-zpW"/>
+                <constraint firstItem="tPm-Tx-inM" firstAttribute="width" secondItem="cQe-RC-LHi" secondAttribute="width" id="1dt-M5-Rne"/>
+                <constraint firstItem="5db-4P-tZb" firstAttribute="height" secondItem="Wj6-8J-SKm" secondAttribute="height" id="2ft-nM-Y9X"/>
+                <constraint firstItem="eI9-xc-5Rg" firstAttribute="centerX" secondItem="xPL-ed-sdl" secondAttribute="centerX" id="3Cd-va-wkp"/>
+                <constraint firstItem="4wk-WO-pec" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" multiplier="75/375" id="3MJ-nx-7fI"/>
+                <constraint firstItem="Gqc-09-VaZ" firstAttribute="height" secondItem="vBe-6i-cJv" secondAttribute="height" id="3VT-SE-RpX"/>
+                <constraint firstItem="5db-4P-tZb" firstAttribute="centerY" secondItem="Wj6-8J-SKm" secondAttribute="centerY" id="52j-7a-map"/>
+                <constraint firstItem="0Qr-kq-Qch" firstAttribute="width" secondItem="vuQ-C1-2aC" secondAttribute="width" id="5MR-53-Ry1"/>
+                <constraint firstItem="a84-kv-bz1" firstAttribute="width" secondItem="vBe-6i-cJv" secondAttribute="width" id="8ah-2J-JGo"/>
+                <constraint firstItem="vuQ-C1-2aC" firstAttribute="height" secondItem="cQe-RC-LHi" secondAttribute="height" id="8lw-JM-GZ4"/>
+                <constraint firstItem="xPL-ed-sdl" firstAttribute="top" secondItem="vuQ-C1-2aC" secondAttribute="top" id="8yS-OW-vdJ"/>
+                <constraint firstItem="Wj6-8J-SKm" firstAttribute="centerY" secondItem="Gqc-09-VaZ" secondAttribute="centerY" id="AWG-iX-jMa"/>
+                <constraint firstItem="2nQ-dP-HjY" firstAttribute="width" secondItem="WpO-lN-r9t" secondAttribute="width" id="AZL-fl-sNg"/>
+                <constraint firstItem="kCO-cp-UNz" firstAttribute="height" secondItem="Gqc-09-VaZ" secondAttribute="height" id="AaB-Td-D05"/>
+                <constraint firstItem="4wk-WO-pec" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="180/200" id="CUa-pn-rpq"/>
+                <constraint firstItem="2nQ-dP-HjY" firstAttribute="centerX" secondItem="5db-4P-tZb" secondAttribute="centerX" id="EyJ-et-rpP"/>
+                <constraint firstItem="4wk-WO-pec" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="190/200" id="GPv-sd-KXE"/>
+                <constraint firstItem="kCO-cp-UNz" firstAttribute="top" secondItem="a84-kv-bz1" secondAttribute="top" id="Id6-tD-9VZ"/>
+                <constraint firstItem="WpO-lN-r9t" firstAttribute="height" secondItem="kCO-cp-UNz" secondAttribute="height" id="KuX-H3-LuW"/>
+                <constraint firstItem="2nQ-dP-HjY" firstAttribute="centerY" secondItem="WpO-lN-r9t" secondAttribute="centerY" id="MZM-OM-l3v"/>
+                <constraint firstItem="znQ-Gb-oh7" firstAttribute="height" secondItem="xPL-ed-sdl" secondAttribute="height" id="Na5-Za-BHn"/>
+                <constraint firstItem="KFu-Mh-ZzK" firstAttribute="centerY" secondItem="eI9-xc-5Rg" secondAttribute="centerY" id="Oef-B2-E8D"/>
+                <constraint firstItem="Gqc-09-VaZ" firstAttribute="width" secondItem="vBe-6i-cJv" secondAttribute="width" id="PI9-Wk-NbP"/>
+                <constraint firstItem="Gqc-09-VaZ" firstAttribute="centerX" secondItem="0Qr-kq-Qch" secondAttribute="centerX" id="PdB-YO-QYm"/>
+                <constraint firstItem="kCO-cp-UNz" firstAttribute="centerX" secondItem="Gqc-09-VaZ" secondAttribute="centerX" id="QYx-3U-x2v"/>
+                <constraint firstItem="Wj6-8J-SKm" firstAttribute="width" secondItem="Gqc-09-VaZ" secondAttribute="width" id="QuG-KG-1Eb"/>
+                <constraint firstItem="KFu-Mh-ZzK" firstAttribute="height" secondItem="eI9-xc-5Rg" secondAttribute="height" id="RFg-kj-Fe0"/>
+                <constraint firstItem="Wj6-8J-SKm" firstAttribute="height" secondItem="Gqc-09-VaZ" secondAttribute="height" id="SAy-P4-aS8"/>
+                <constraint firstItem="a84-kv-bz1" firstAttribute="leading" secondItem="vBe-6i-cJv" secondAttribute="leading" id="SGj-vA-Nyt"/>
+                <constraint firstItem="vuQ-C1-2aC" firstAttribute="top" secondItem="cQe-RC-LHi" secondAttribute="top" id="Sav-YZ-kbr"/>
+                <constraint firstItem="2nQ-dP-HjY" firstAttribute="height" secondItem="WpO-lN-r9t" secondAttribute="height" id="SuR-ml-d5N"/>
+                <constraint firstItem="vBe-6i-cJv" firstAttribute="leading" secondItem="tPm-Tx-inM" secondAttribute="leading" id="UME-Jz-Qb0"/>
+                <constraint firstItem="vuQ-C1-2aC" firstAttribute="width" secondItem="cQe-RC-LHi" secondAttribute="width" id="VDT-IZ-hoc"/>
+                <constraint firstItem="a84-kv-bz1" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="19/20" id="Ve7-ml-CoC"/>
+                <constraint firstItem="znQ-Gb-oh7" firstAttribute="width" secondItem="xPL-ed-sdl" secondAttribute="width" id="YSP-J3-87c"/>
+                <constraint firstItem="cQe-RC-LHi" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="42/200" id="YVh-pG-HUk"/>
+                <constraint firstItem="eI9-xc-5Rg" firstAttribute="height" secondItem="xPL-ed-sdl" secondAttribute="height" id="a6d-Dl-SkJ"/>
+                <constraint firstItem="znQ-Gb-oh7" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" multiplier="367/375" id="aJN-Bm-ePT"/>
+                <constraint firstItem="WpO-lN-r9t" firstAttribute="centerY" secondItem="kCO-cp-UNz" secondAttribute="centerY" id="aTa-cL-NlB"/>
+                <constraint firstItem="tPm-Tx-inM" firstAttribute="centerX" secondItem="cQe-RC-LHi" secondAttribute="centerX" id="c6y-NE-N7l"/>
+                <constraint firstItem="WpO-lN-r9t" firstAttribute="centerX" secondItem="Wj6-8J-SKm" secondAttribute="centerX" id="cIK-A4-DZ1"/>
+                <constraint firstItem="xPL-ed-sdl" firstAttribute="width" secondItem="vuQ-C1-2aC" secondAttribute="width" id="cmw-YH-Eur"/>
+                <constraint firstItem="cQe-RC-LHi" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" multiplier="148/375" id="eJg-ug-bgw"/>
+                <constraint firstItem="KFu-Mh-ZzK" firstAttribute="centerX" secondItem="znQ-Gb-oh7" secondAttribute="centerX" id="fjK-fM-7HQ"/>
+                <constraint firstItem="0Qr-kq-Qch" firstAttribute="top" secondItem="tPm-Tx-inM" secondAttribute="top" id="hnU-lr-Zsd"/>
+                <constraint firstItem="vBe-6i-cJv" firstAttribute="height" secondItem="tPm-Tx-inM" secondAttribute="height" id="hxq-PR-Ice"/>
+                <constraint firstItem="vBe-6i-cJv" firstAttribute="width" secondItem="tPm-Tx-inM" secondAttribute="width" id="iKM-iT-08i"/>
+                <constraint firstItem="eI9-xc-5Rg" firstAttribute="centerY" secondItem="0Qr-kq-Qch" secondAttribute="centerY" id="iwU-xf-0yN"/>
+                <constraint firstItem="0Qr-kq-Qch" firstAttribute="centerX" secondItem="vuQ-C1-2aC" secondAttribute="centerX" id="j2n-kn-Rox"/>
+                <constraint firstItem="Wj6-8J-SKm" firstAttribute="centerX" secondItem="eI9-xc-5Rg" secondAttribute="centerX" id="jC2-ZV-sq6"/>
+                <constraint firstItem="5db-4P-tZb" firstAttribute="centerX" secondItem="KFu-Mh-ZzK" secondAttribute="centerX" id="kly-iY-dZT"/>
+                <constraint firstItem="xPL-ed-sdl" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" multiplier="294/375" id="l1v-o1-Bjg"/>
+                <constraint firstItem="5db-4P-tZb" firstAttribute="width" secondItem="Wj6-8J-SKm" secondAttribute="width" id="lL3-dV-M2E"/>
+                <constraint firstItem="kCO-cp-UNz" firstAttribute="width" secondItem="Gqc-09-VaZ" secondAttribute="width" id="lxq-mX-BfZ"/>
+                <constraint firstItem="eI9-xc-5Rg" firstAttribute="width" secondItem="xPL-ed-sdl" secondAttribute="width" id="mpX-5I-b1u"/>
+                <constraint firstItem="tPm-Tx-inM" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="98/200" id="nbD-9G-19r"/>
+                <constraint firstItem="WpO-lN-r9t" firstAttribute="width" secondItem="kCO-cp-UNz" secondAttribute="width" id="p0Z-yz-CcV"/>
+                <constraint firstItem="vuQ-C1-2aC" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" multiplier="221/375" id="qsB-Zb-vW8"/>
+                <constraint firstItem="xPL-ed-sdl" firstAttribute="height" secondItem="vuQ-C1-2aC" secondAttribute="height" id="rbu-qP-5y3"/>
+                <constraint firstItem="cQe-RC-LHi" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="52/200" id="rf6-iR-Xdo"/>
+                <constraint firstItem="Gqc-09-VaZ" firstAttribute="top" secondItem="vBe-6i-cJv" secondAttribute="top" id="sUU-ZC-TGn"/>
+                <constraint firstItem="znQ-Gb-oh7" firstAttribute="top" secondItem="xPL-ed-sdl" secondAttribute="top" id="sax-H9-Nbt"/>
+                <constraint firstItem="cQe-RC-LHi" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="67/375" id="tst-R4-N54"/>
+                <constraint firstItem="KFu-Mh-ZzK" firstAttribute="width" secondItem="eI9-xc-5Rg" secondAttribute="width" id="vYJ-rK-UWi"/>
+                <constraint firstItem="tPm-Tx-inM" firstAttribute="height" secondItem="cQe-RC-LHi" secondAttribute="height" id="xpT-QM-bhY"/>
+                <constraint firstItem="0Qr-kq-Qch" firstAttribute="height" secondItem="vuQ-C1-2aC" secondAttribute="height" id="y4B-Qf-rtw"/>
+                <constraint firstItem="4wk-WO-pec" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="67/375" id="yfg-ic-ZI5"/>
+                <constraint firstItem="vBe-6i-cJv" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" multiplier="144/200" id="zeJ-kM-MPH"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="486" y="-508"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="delete_button" width="16" height="16"/>
+    </resources>
+</document>

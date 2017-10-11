@@ -1,0 +1,419 @@
+//
+//  HDMarketViewController.m
+//  HDStock
+//
+//  Created HD liyancheng on 16/11/22.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+#import "AppDelegate.h"
+#import "HDLeftPersonalViewController.h"
+#import "HDMarketViewController.h"
+#import "HDSearchCenterViewController.h"
+#import "HDMarketSearchTF.h"
+#import "HDMarketMainTableViewCell.h"
+#import "HDMarketDetailViewController.h"
+#import "marketListModel.h"
+#import "marketAddSelectedCell.h"
+#define isFirsrLoad @"isFirsrLoad"
+#define firstLoadFlag [[[LYCUserManager informationDefaultUser].defaultUser objectForKey:isFirsrLoad] isEqualToString:@"no"]
+@interface HDMarketViewController ()<UITableViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate>
+@property (nonatomic,strong) UITableView *tableView1;
+@end
+
+@implementation HDMarketViewController{
+    BOOL hasSelectedStock;
+    //添加自选股按钮
+    UIButton * addButton;
+    NSMutableArray *dataArr;
+    NSMutableArray *collectedArr;
+    BOOL canEdit;
+    UIView *topView;
+    NSMutableArray * codeArr;
+    NSMutableArray * ContainCodeArr;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setOriginData];
+    //设置导航条
+    [self setNavigation];
+    //设置添加自选股按钮
+    [self setTableView];
+    [self setTopView];
+    self.view.backgroundColor = PCBackColor;
+    canEdit = NO;
+    if(!collectedArr){
+        collectedArr = @[].mutableCopy;
+    }
+    if(!codeArr){
+        codeArr = @[].mutableCopy;
+    }if(!ContainCodeArr){
+        ContainCodeArr = @[].mutableCopy;
+    }
+    if([[[LYCUserManager informationDefaultUser].defaultUser objectForKey:isFirsrLoad] isEqualToString:@"no"]){
+        NSArray *tempArr = [[LYCUserManager informationDefaultUser].defaultUser objectForKey:MarketSearchDataKey];
+        collectedArr = [NSMutableArray arrayWithArray:tempArr];
+        [self loadDataOfProductList];
+    }else{
+        [self loadDataOfProductList];
+    }
+    NSArray * arr = self.view.gestureRecognizers;
+    NSLog(@"%@",arr);
+    
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    if([[LYCUserManager informationDefaultUser].defaultUser objectForKey:MarketSearchDataKey]){
+        NSArray *tempArr =  [[LYCUserManager informationDefaultUser].defaultUser objectForKey:MarketSearchDataKey];
+        collectedArr = [NSMutableArray arrayWithArray:tempArr];
+    }
+    
+}
+
+- (void)setTopView{
+    topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 42)];
+    [self.view addSubview:topView];
+    topView.backgroundColor = RGBCOLOR(243, 243, 243);
+    NSArray *titleArr = @[@"股票名称",@"最新价",@"涨跌幅"];
+    for (int i=0; i<3; i++) {
+        UIView *view = [[UIView alloc]initWithFrame:CGRectMake(i*SCREEN_WIDTH/3, 0, SCREEN_WIDTH/3, 42)];
+        [topView addSubview:view];
+        UILabel * label = [[UILabel alloc]init];
+        label.text = titleArr[i];
+        label.font = [UIFont systemFontOfSize:13];
+        label.textColor = RGBCOLOR(51, 51, 51);
+        [label sizeToFit];
+        label.tag = 200+i;
+        label.center = view.center;
+        [topView addSubview:label];
+        UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(label.frame), CGRectGetMaxY(label.frame)-6, 6, 6)];
+        [topView addSubview:image];
+        if(i!=0){
+            image.image = [UIImage imageNamed:@""];
+        }
+    }
+}
+
+- (void)setOriginData{
+    hasSelectedStock = NO;//初始化为NO 没有自选股
+}
+
+
+- (void)setAddButton{
+    CGFloat resize = [[UIScreen mainScreen] bounds].size.width/375;
+    CGFloat widthOfScreen = [[UIScreen mainScreen] bounds].size.width;
+    
+    addButton = [[UIButton alloc]initWithFrame:CGRectMake(widthOfScreen/2-52.5*resize, 240*resize, 105*resize, 105*resize)];
+    [addButton setBackgroundImage:[UIImage imageNamed:@"add"] forState:UIControlStateNormal];
+    [addButton addTarget:self action:@selector(jumpToSearchView) forControlEvents:UIControlEventTouchUpInside];
+    
+    if(hasSelectedStock){
+        addButton.hidden = YES;
+    }
+    
+    [self.view addSubview:addButton];
+}
+
+- (void)jumpToSearchView{
+    
+    HDSearchCenterViewController * vc = [[HDSearchCenterViewController alloc]init];
+    
+    [self.navigationController pushViewController:vc animated:NO];
+    
+}
+
+- (void)setNavigation{
+    self.title = @"行情";
+    UIButton * btn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+    btn.frame = CGRM(0, 0, 32, 44);
+    [btn setTitle:@"编辑" forState:UIControlStateNormal];
+    [btn setTitle:@"完成" forState:UIControlStateSelected];
+    btn.titleLabel.font = [UIFont systemFontOfSize:15] ;
+    btn.titleLabel.textAlignment = NSTextAlignmentLeft;
+    [btn setTitleColor:[UIColor whiteColor] forState:(UIControlStateNormal)];
+    [btn addTarget:self action:@selector(editButtonClicked:) forControlEvents:(UIControlEventTouchUpInside)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:btn];
+}
+
+#pragma mark --- 编辑
+- (void)editButtonClicked:(UIButton *)sender{
+    sender.selected = !sender.selected;
+    canEdit = sender.selected;
+    [_tableView1 setEditing:canEdit animated:YES];
+    [_tableView1 reloadData];
+    UILabel *label = (UILabel *)[topView viewWithTag:202];
+    UILabel *label1 = (UILabel *)[topView viewWithTag:200];
+    
+    if(canEdit){
+        AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        HDLeftPersonalViewController *vc = (HDLeftPersonalViewController*)app.window.rootViewController;
+        [vc.view removeGestureRecognizer:vc.panGes];
+    }else{
+        AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        HDLeftPersonalViewController *vc = (HDLeftPersonalViewController*)app.window.rootViewController;
+        [vc.view addGestureRecognizer:vc.panGes];
+    }
+    
+    if(canEdit){
+        self.tableView1.mj_header = nil;
+        self.tableView1.mj_footer = nil;
+        [UIView animateWithDuration:0.25 animations:^{
+            label.transform = CGAffineTransformMakeTranslation(32, 0);
+            label1.transform = CGAffineTransformMakeTranslation(32, 0);
+        }];
+        label.text = @"拖动";
+    }else{
+        WEAK_SELF;
+        [UIView animateWithDuration:0.25 animations:^{
+            label.transform = CGAffineTransformIdentity;
+            label1.transform = CGAffineTransformIdentity;
+        }];
+        self.tableView1.mj_header = [PSYRefreshGifHeader headerWithRefreshingBlock:^{
+            [dataArr removeAllObjects];
+            [weakSelf loadDataOfProductList];
+        }];
+        label.text = @"涨跌幅";
+    }
+}
+
+//搜索按钮点击时
+- (IBAction)searchButtonClicked:(id)sender {
+    
+    [self jumpToSearchView];
+    
+}
+
+- (void)setTableView{
+    if(!dataArr){
+        dataArr = @[].mutableCopy;
+    }
+    if(!_tableView1){
+        _tableView1 = [[UITableView alloc]init];
+    }
+    self.tableView1.delegate = self;
+    self.tableView1.dataSource = self;
+    self.tableView1.backgroundColor = RGBCOLOR(243, 243, 243);
+    self.tableView1.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"HDMarketMainTableViewCell" bundle:nil] forCellReuseIdentifier:@"HDMarketMainTableViewCell"];
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"marketAddSelectedCell" bundle:nil] forCellReuseIdentifier:@"marketAddSelectedCell"];
+    self.tableView1.frame = CGRectMake(0, 42, SCREEN_WIDTH, SCREEN_HEIGHT-64-42-49);
+    [self.view addSubview:_tableView1];
+    WEAK_SELF;
+    self.tableView1.mj_header = [PSYRefreshGifHeader headerWithRefreshingBlock:^{
+        [dataArr removeAllObjects];
+        [weakSelf loadDataOfProductList];
+    }];
+//    self.tableView1.mj_footer = [PSYRefreshGifFooter footerWithRefreshingBlock:^{
+//        //因为没分页 所以全删
+//        [dataArr removeAllObjects];
+//        [weakSelf loadDataOfProductList];
+//    }];
+    
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    if(section ==0){
+        return dataArr.count;
+    }else{
+        return 1;
+    }
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(indexPath.section==0){
+        HDMarketMainTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"HDMarketMainTableViewCell"];
+        if(dataArr.count>0){
+            cell.model = dataArr[indexPath.row];
+            cell.raiseRange.hidden = canEdit;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+        return cell;
+    }else{
+        marketAddSelectedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"marketAddSelectedCell"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.block = ^{
+            [self jumpToSearchView];
+        };
+        return cell;
+    }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 60*SCREEN_WIDTH/375;
+}
+
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    if(canEdit){
+        return 1;
+    }else{
+        return 2;
+    }
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(canEdit){
+        NSLog(@"selected");
+    }else{
+        marketListModel *model =dataArr[indexPath.row];
+        HDMarketDetailViewController *detail = [[HDMarketDetailViewController alloc]init];
+        detail.codeStr = model.Symbol;
+        detail.title = model.Name;
+        [self.navigationController pushViewController:detail animated:YES];
+    }
+}
+
+- (void)loadDataOfProductList{
+    
+    NSMutableString * url;
+    if(firstLoadFlag){
+         url = [NSMutableString stringWithFormat:@"%@",@"http://gk.cdtzb.com/api/product/queryStock/"];
+    }else{
+         url = [NSMutableString stringWithFormat:MarketDefaultListURL];
+    }
+    [codeArr removeAllObjects];
+    
+    if(collectedArr.count>0){
+        for (NSString *str in collectedArr) {
+            [codeArr addObject:str];
+        }
+    }
+    NSMutableString * mutStr;
+    if(codeArr.count>0){
+        mutStr = [NSMutableString stringWithFormat:@"%@",codeArr[0]];
+        [codeArr removeFirstObject];
+        for (NSString *str in codeArr) {
+            [mutStr appendString:[NSString stringWithFormat:@",%@",str]];
+        }
+    }
+    
+    NSMutableDictionary *mutDic = @{}.mutableCopy;
+    if(mutStr!=nil){
+        [mutDic setObject:mutStr forKey:@"code"];
+    }
+    
+    WEAK_SELF;
+    STRONG_SELF;
+    //默认的那几条  第一次之后换接口
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[CDAFNetWork sharedMyManager]post:url params:firstLoadFlag?mutDic:nil success:^(id json) {
+            if([json[@"code"] isEqual:@(1)]){
+                if(firstLoadFlag){
+                    for (NSDictionary *dic in json[@"data"]) {
+                        
+                        marketListModel * model = [marketListModel yy_modelWithDictionary:dic];
+                        if([collectedArr containsObject:model.Symbol]){
+                            [dataArr addObject:model];
+                        }
+                    }
+                    
+                    for (int i = collectedArr.count-1; i>=0; i--) {
+                        NSString *str = collectedArr[i];
+                        for (marketListModel *model in dataArr) {
+                            if([model.Symbol isEqualToString:str]){
+                                marketListModel *modeled = model;
+                                [dataArr removeObject:model];
+                                [dataArr insertObject:modeled atIndex:0];
+                                break;
+                            }
+                        }
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.tableView1 reloadData];
+                    });
+                    [self endRefresh];
+                }else{
+                    for (NSDictionary *dic in json) {
+                        marketListModel * model = [marketListModel yy_modelWithDictionary:dic];
+                        [collectedArr addObject:model.Symbol];
+                        [dataArr addObject:model];
+                    }
+                    [[LYCUserManager informationDefaultUser].defaultUser setObject:collectedArr forKey:MarketSearchDataKey];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.tableView1 reloadData];
+                    });
+                    [self endRefresh];
+                }
+                [[LYCUserManager informationDefaultUser].defaultUser setObject:@"no" forKey:isFirsrLoad];
+            }else{
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.label.text = @"数据加载错误";
+                [hud hideAnimated:YES afterDelay: 1];
+            }
+            
+            
+        } failure:^(NSError *error) {
+            [self endRefresh];
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+            hud.mode = MBProgressHUDModeText;
+            hud.label.text = @"加载错误";
+            [hud hideAnimated:YES afterDelay: 2];
+        }];
+    });
+}
+
+-(void)endRefresh{
+    [self.tableView1.mj_header endRefreshing];
+    [self.tableView1.mj_footer endRefreshing];
+}
+
+-  (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return canEdit;
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellEditingStyleDelete;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+{
+    
+    if (sourceIndexPath.row == destinationIndexPath.row) return;
+    marketListModel *model = [dataArr objectAtIndex:sourceIndexPath.row];
+    marketListModel *destinationModel = [dataArr objectAtIndex:destinationIndexPath.row];
+    [dataArr removeObjectAtIndex:sourceIndexPath.row];
+    [dataArr insertObject:model atIndex:destinationIndexPath.row];
+    NSInteger collectedArrRow = [collectedArr indexOfObject:model.Symbol];
+    NSInteger destinationIndexPathRow = [collectedArr indexOfObject:destinationModel.Symbol];
+    NSString *str = [collectedArr objectAtIndex:collectedArrRow];
+    [collectedArr removeObjectAtIndex:collectedArrRow];
+    [collectedArr insertObject:str atIndex:destinationIndexPathRow];
+    [[LYCUserManager informationDefaultUser].defaultUser setObject:collectedArr forKey:MarketSearchDataKey];
+    
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+{
+    /*首先调用父类的方法*/
+    [super setEditing:editing animated:animated];
+    /*使tableView出于编辑状态*/
+    [self.tableView1 setEditing:editing animated:animated];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSUInteger row = [indexPath row];
+        marketListModel *model = dataArr[row];
+        [dataArr removeObjectAtIndex:row];
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                         withRowAnimation:UITableViewRowAnimationAutomatic];
+        [collectedArr removeObject:model.Symbol];
+        [[LYCUserManager informationDefaultUser].defaultUser setObject:collectedArr forKey:MarketSearchDataKey];
+    }
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    
+}
+
+@end

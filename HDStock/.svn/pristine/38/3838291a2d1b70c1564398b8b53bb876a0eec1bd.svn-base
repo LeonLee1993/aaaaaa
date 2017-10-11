@@ -1,0 +1,71 @@
+//
+//  HDFailLoadView.m
+//  HDStock
+//
+//  Created by hd-app02 on 2016/12/19.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDFailLoadView.h"
+
+@implementation HDFailLoadView{
+
+    UIImageView * imageview;
+
+    UILabel * label;
+    
+    UIButton * button;
+
+}
+
+- (instancetype)initWithFrame:(CGRect)frame{
+
+    if (self = [super initWithFrame:frame]) {
+        
+        imageview = [[UIImageView alloc]initWithFrame:CGRectZero];
+        imageview.image = [UIImage imageNamed:@""];
+        label = [[UILabel alloc]initWithFrame:CGRectZero];
+        label.text = @"牛博士走丢了";
+        label.font = [UIFont systemFontOfSize:11];
+        label.textColor = [UIColor darkGrayColor];
+        label.textAlignment = NSTextAlignmentCenter;
+        
+        button = [[UIButton alloc]initWithFrame:CGRectZero];
+        [button setTitle:@"点击刷新" forState:UIControlStateNormal];
+        [button setTitleColor:MAIN_COLOR forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(buttonOnTouched:) forControlEvents:UIControlEventTouchUpInside];
+        
+        [self addSubview:imageview];
+        [self addSubview:label];
+        [self addSubview:button];
+        
+        
+    }
+
+    return self;
+
+}
+
+- (void)layoutSubviews{
+
+    [super layoutSubviews];
+    
+    imageview.frame = CGRectMake(0, 0, self.width, self.width * 66 / 79);
+    
+    imageview.centerX = self.centerX;
+    
+    label.frame = CGRectMake(0, CGRectGetMaxY(imageview.frame) + 15, self.width, 12);
+    
+    button.frame = CGRectMake(0, CGRectGetMaxY(label.frame) + 10, self.width, 12);
+
+}
+
+- (void)buttonOnTouched:(UIButton *)button{
+
+
+
+
+
+}
+
+@end

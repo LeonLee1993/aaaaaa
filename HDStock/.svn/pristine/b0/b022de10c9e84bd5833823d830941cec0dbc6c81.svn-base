@@ -1,0 +1,537 @@
+//
+//  HDHomePageViewController.m
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDHomePageViewController.h"
+
+@interface HDHomePageViewController ()<UITableViewDataSource,UITableViewDelegate,PopoverViewDelegate,PopoverBaseViewDelegate,ATCarouselViewDelegate,PSYScrollButtonsDelegate,PSYScrollButtonViewsDelegate>
+
+@property (weak, nonatomic) IBOutlet UITableView *mainTableView;
+@property (nonatomic, strong) NSMutableArray * headLinedataArray;
+
+@end
+
+static NSInteger segmentSelection = 0;
+
+@implementation HDHomePageViewController{
+
+    NSInteger page;
+
+    NSInteger perpage;
+    
+    NSInteger cateId;
+
+}
+
+
+- (NSMutableArray *)headLinedataArray{
+
+    if (!_headLinedataArray) {
+        
+        _headLinedataArray = [[NSMutableArray alloc]init];
+    }
+
+    return _headLinedataArray;
+
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    page = 1;
+    
+    perpage = 10;
+    
+    cateId = 1;
+    
+    [self requestData];
+    
+    [self setUpTableView];
+    
+}
+
+- (void)setUpTableView{
+    
+    [self setNavDic];
+
+    _mainTableView.dataSource = self;
+    
+    _mainTableView.delegate = self;
+    
+    _mainTableView.tableFooterView.backgroundColor = COLOR(lightGrayColor);
+    
+    _mainTableView.allowsSelection = YES;
+    
+    [_mainTableView registerNib:[UINib nibWithNibName:@"HDTopScrollCell" bundle:nil] forCellReuseIdentifier:@"HDTopScrollCell"];
+    [_mainTableView registerNib:[UINib nibWithNibName:@"HDMiddleCell" bundle:nil] forCellReuseIdentifier:@"HDMiddleCell"];
+    
+    [self.mainTableView registerNib:[UINib nibWithNibName:@"HDHeadLineBaseCell" bundle:nil] forCellReuseIdentifier:@"HDHeadLineBaseCell"];
+    [self.mainTableView registerNib:[UINib nibWithNibName:@"HDHeadLineSingleViewCell" bundle:nil] forCellReuseIdentifier:@"HDHeadLineSingleViewCell"];
+    [self.mainTableView registerNib:[UINib nibWithNibName:@"HDHeadLineBigViewCellCell" bundle:nil] forCellReuseIdentifier:@"HDHeadLineBigViewCellCell"];
+    [self.mainTableView registerNib:[UINib nibWithNibName:@"HDHeadLineThreeViewCellCell" bundle:nil] forCellReuseIdentifier:@"HDHeadLineThreeViewCellCell"];
+    
+    WEAK_SELF;
+    
+    self.mainTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+       
+        [weakSelf requestData];
+        
+    }];
+    
+    self.mainTableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+        
+        perpage = 50;
+        
+        [weakSelf requestData];
+        
+    }];
+    
+}
+
+#pragma mark === tableview data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+
+    return 3;
+
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+
+    if (section == 2) {
+        
+        if (self.headLinedataArray.count != 0) {
+            
+            return self.headLinedataArray.count;
+            
+        }
+
+    }
+    
+    return 1;
+
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+
+    switch (indexPath.section) {
+        case 0:
+            return HDTopCellHeight;
+            break;
+        case 1:
+            return HDMiddleCellHeight;
+            break;
+        case 2:
+            
+                if (self.headLinedataArray.count == 0) {
+                    
+                    return SCREEN_HEIGHT;
+                }else{
+                
+                HDHeadLineModel * model = [self.headLinedataArray objectAtIndexCheck:indexPath.row];
+                return model.cellHeight;
+                }
+                
+            break;
+            
+        default:
+            break;
+    }
+    
+    return 0;
+
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+
+    if (section == 2) {
+        
+        return 0;
+    }
+    
+    return 10;
+
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    switch (indexPath.section) {
+            
+        case 0:{
+            
+            self.mainTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            
+            HDTopScrollCell * cell = [_mainTableView dequeueReusableCellWithIdentifier:@"HDTopScrollCell"];
+            
+            cell.topScrollView.delegate = self;
+            cell.topScrollView.images = @[imageNamed(@"111"),imageNamed(@"222"),imageNamed(@"333")];
+            cell.topScrollView.currentPageColor = [UIColor orangeColor];
+            cell.topScrollView.pageColor = [UIColor grayColor];
+            
+            cell.topScrollButtons.delegate = self;
+            
+            return cell;
+        }
+            break;
+            
+        case 1:{
+            self.mainTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            
+            HDMiddleCell * cell = [_mainTableView dequeueReusableCellWithIdentifier:@"HDMiddleCell"];
+            
+            cell.psyScrollButtonView.delegate = self;
+            
+            return cell;
+            
+        }
+            break;
+        
+        case 2:
+            
+            //if(segmentSelection == 0){
+                
+                if (_headLinedataArray.count != 0) {
+                
+                self.mainTableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+                
+                HDHeadLineModel * headlineModel = [self.headLinedataArray objectAtIndexCheck:indexPath.row];
+                
+                HDHeadLineBaseCell * cellBase = [tableView dequeueReusableCellWithIdentifier:@"HDHeadLineBaseCell"];
+                cellBase.model = headlineModel;
+                [cellBase.cancleButton addTarget:self action:@selector(cancelButtonOnTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+                
+                HDHeadLineSingleViewCell * cellSingle = [tableView dequeueReusableCellWithIdentifier:@"HDHeadLineSingleViewCell"];
+                cellSingle.model = headlineModel;
+                [cellSingle.cancleButton addTarget:self action:@selector(cancelButtonOnTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+                
+                HDHeadLineBigViewCellCell * cellBig = [tableView dequeueReusableCellWithIdentifier:@"HDHeadLineBigViewCellCell"];
+                cellBig.model = headlineModel;
+                [cellBig.cancleButton addTarget:self action:@selector(cancelButtonOnTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+                
+                HDHeadLineThreeViewCellCell * cellThreeView = [tableView dequeueReusableCellWithIdentifier:@"HDHeadLineThreeViewCellCell"];
+                cellThreeView.model = headlineModel;
+                [cellThreeView.cacleButton addTarget:self action:@selector(cancelButtonOnTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+                
+                    if(headlineModel.pic.length > 1){
+                        
+                        if (!headlineModel.countmanypic) {
+                            
+                            return cellSingle;
+                            
+                        }
+                        if (headlineModel.countmanypic) {
+                            
+                            if (headlineModel.countmanypic == 1) {
+                                
+                                return cellSingle;
+                                
+                            }else if (headlineModel.countmanypic == 2){
+                                
+                                return cellBig;
+                                
+                            }else if (headlineModel.countmanypic == 3){
+                                
+                                return cellThreeView;
+                                
+                            }
+                        }
+                    }
+                    if (headlineModel.pic.length == 0) {
+                        
+                        if (!headlineModel.countmanypic) {
+                            
+                            return cellBase;
+                        }
+                        
+                        if (headlineModel.countmanypic) {
+                            if (headlineModel.countmanypic == 1) {
+                                
+                                return  cellSingle;
+                                
+                            }else if (headlineModel.countmanypic == 2){
+                                
+                                return cellBig;
+                                
+                            }else if (headlineModel.countmanypic == 3){
+                                
+                                return cellThreeView;
+                                
+                            }
+                        }
+                    }
+                }else{
+                
+                    UITableViewCell * cell = [_mainTableView dequeueReusableCellWithIdentifier:@"cell1"];
+                    
+                    if (!cell) {
+                        
+                        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell1"];
+                    }
+                    
+                    return cell;
+                
+                }
+        
+            break;
+        default:
+            break;
+    }
+
+    return nil;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    
+    if (section == 2) {
+        
+        return 40;
+        
+    }
+    return 0;
+    
+}
+
+- (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    
+    if (section == 2) {
+        
+        NSArray * btnDataSource = @[@"精选", @"热点资讯",@"牛股挖掘机", @"每日金股"];
+        
+        YJSegmentedControl * segment = [YJSegmentedControl segmentedControlFrame:CGRM(0, 0,SCREEN_SIZE_WIDTH , 40) titleDataSource:btnDataSource backgroundColor:[UIColor whiteColor] titleColor:[UIColor blackColor] titleFont:systemFont(16) selectColor:MAIN_COLOR buttonDownColor:MAIN_COLOR Delegate:self selectSeg:segmentSelection];
+        
+        return segment;
+        
+    }
+    
+    return nil;
+}
+
+-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if (indexPath.section == 2 && self.headLinedataArray.count != 0) {
+        return YES;
+    }
+    
+    return NO;
+    
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    HDHeadLineModel * model = [self.headLinedataArray objectAtIndexCheck:indexPath.row];
+    
+    HeadLineViewController * headVC = [[HeadLineViewController alloc]init];
+    
+    headVC.hidesBottomBarWhenPushed = YES;
+    
+    headVC.aid = model.aid;
+    
+    [self.navigationController pushViewController:headVC animated:NO];
+    
+    
+}
+
+#pragma mark ==== 点击事件
+//头条快讯切换
+- (void)segumentSelectionChange:(UIButton *)selection{
+    
+    NSLog(@"%ld",(long)selection.tag);
+    
+    if (selection.tag == 1200) {
+        
+        segmentSelection = 0;
+        cateId = 1;
+        
+    }else if (selection.tag == 1201){
+        
+        segmentSelection = 1;
+        cateId = 14;
+        
+    }else if (selection.tag == 1202){
+        
+        segmentSelection = 2;
+        cateId = 22;
+        
+    }else if (selection.tag == 1203){
+        
+        segmentSelection = 3;
+        cateId = 16;
+    }
+    
+     [self.mainTableView scrollToRow:0 inSection:2 atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    
+    [self requestData];
+    
+    [UIView performWithoutAnimation:^{
+        
+        [self.mainTableView reloadSection:2 withRowAnimation:UITableViewRowAnimationNone];
+        
+    }];
+    
+}
+    
+
+- (void)cancelButtonOnTouchUpInside:(UIButton *)sender{
+        
+    CGPoint point = [sender.superview convertPoint:sender.center toView:self.view];
+        
+    BaseView * baseview = [[BaseView alloc]initWithFrame:CGRectMake(0, 0, 150, 90)];
+    baseview.backgroundColor = [UIColor whiteColor];
+        
+    baseview.layer.borderColor = [UIColor whiteColor].CGColor;
+        
+    baseview.layer.masksToBounds = YES;
+        
+    baseview.delegate = self;
+    
+    [PopoverView showPopoverAtPoint:point inView:self.view withContentView:baseview delegate:self];
+        
+}
+
+- (void)popoverViewDismiss:(CGPoint)arrowPoint{
+    
+    //NSLog(@"坐标%f,%f,%f",arrowPoint.x,arrowPoint.y,self.mainTableView.contentOffset.y)
+    
+    CGPoint pathPoint = CGPointMake(arrowPoint.x, arrowPoint.y + self.mainTableView.contentOffset.y - 50);
+    
+    NSIndexPath * path = [self.mainTableView indexPathForRowAtPoint:pathPoint];
+    
+//    HDHeadLineBaseCell * cell = [self.mainTableView cellForRowAtIndexPath:path];
+//    
+//    NSLog(@"%f",cell.frame.origin.y);
+    
+    [self.headLinedataArray removeObjectAtIndex:path.row];
+    [self.mainTableView deleteRowAtIndexPath:path withRowAnimation:UITableViewRowAnimationLeft];
+    
+}
+
+- (void)carouselView:(ATCarouselView *)carouselView indexOfClickedImageBtn:(NSUInteger)index{
+    
+    NSLog(@"第%lu张图片被点击",(unsigned long)index);
+    
+}
+
+- (void)psySimpleButtonOnTouched:(UIButton *)button{
+    
+    HDInfoMationViewController * infoVC = self.tabBarController.childViewControllers[2];
+    
+    [self.tabBarController setSelectedViewController:infoVC];
+
+    
+
+
+}
+
+- (void)psyScrollButtonOnTouched:(UIButton *)button{
+
+    NSLog(@"点击%lu",(long)button.tag);
+
+}
+
+- (IBAction)personalCenterButtonOntouched:(UIButton *)sender {
+    
+    HDPersonalCenterViewController * vc = [[HDPersonalCenterViewController alloc]init];
+    
+    
+    [self.navigationController pushViewController:vc animated:NO];
+    
+}
+
+
+- (IBAction)searchItemOntouched:(UIButton *)sender {
+    
+    HDSearchCenterViewController * vc = [[HDSearchCenterViewController alloc]init];
+    
+    [self.navigationController pushViewController:vc animated:NO];
+    
+    
+}
+
+#pragma mark - 网络请求
+- (void)requestData{
+    
+    NSString * url = [NSString stringWithFormat:Home_HeadLineCateNews,page,perpage,cateId,arc4random()%10000];
+    
+    NSLog(@"%@",url);
+    WEAK_SELF;
+    //1.获取一个全局串行队列
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    
+    dispatch_async(queue, ^{
+        
+        STRONG_SELF;
+        
+        [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+            
+            if (perpage == 100) {
+                
+                [self.mainTableView.mj_footer endRefreshingWithNoMoreData];
+                
+            }else{
+                
+                [self endRefresh];
+                
+            }
+            
+            NSArray * dataArr = json[@"data"];
+            
+            if (1 == page) { // 说明是在重新请求数据.
+                
+                [self.headLinedataArray removeAllObjects];
+            }
+            
+            if (self.headLinedataArray.count != 0) {
+                
+                [self.headLinedataArray removeAllObjects];
+                
+            }
+            
+            for (NSDictionary * dic in dataArr) {
+                
+                HDHeadLineModel * headlinemodel = [HDHeadLineModel yy_modelWithDictionary:dic];
+                
+                [strongSelf.headLinedataArray addObject:headlinemodel];
+                
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                [strongSelf.mainTableView reloadData];
+                
+            });
+            
+        } failure:^(NSError *error) {
+            
+            [self endRefresh];
+            
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            hud.mode = MBProgressHUDModeText;
+            hud.label.text = @"您的网络不给力!";
+            [hud hideAnimated:YES afterDelay: 2];
+            
+        }];
+        
+    });
+    
+}
+
+#pragma mark--刷新进度条显示
+//停止刷新
+-(void)endRefresh{
+    
+    [self.mainTableView.mj_header endRefreshing];
+    [self.mainTableView.mj_footer endRefreshing];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+@end

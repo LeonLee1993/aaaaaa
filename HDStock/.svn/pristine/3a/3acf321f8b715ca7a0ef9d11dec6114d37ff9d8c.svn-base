@@ -1,0 +1,29 @@
+//
+//  MyAskAndAnswerViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/11/28.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "MyAskAndAnswerViewController.h"
+
+@interface MyAskAndAnswerViewController ()
+
+@end
+
+@implementation MyAskAndAnswerViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self setHeader:@"我的问答"];
+    [self initTopViewWithArray:@[@"未回复",@"已回复",@"已失效"]];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+@end

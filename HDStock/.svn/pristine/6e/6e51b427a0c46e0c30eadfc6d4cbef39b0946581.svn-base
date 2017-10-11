@@ -1,0 +1,121 @@
+//
+//  PCForgetPWViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/5.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "PCForgetPWViewController.h"
+#define getCode @"http://test.cdtzb.com/api.php?mod=member&act=note&mobile=%@&type=%@&test=1%d"
+@interface PCForgetPWViewController ()
+@property (nonatomic, strong) NSTimer *Timer;//倒计时
+@property (nonatomic, assign) int countdown;
+@end
+
+@implementation PCForgetPWViewController{
+    NSString *_vertify;
+    NSDictionary *dic;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [_firstTF becomeFirstResponder];
+    // Do any additional setup after loading the view from its nib.
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)VertifButtonClicked:(UIButton *)sender {
+    
+    _vertifyButton.userInteractionEnabled = NO;
+    _countdown = 30;
+    [self requestCode];
+    sender.layer.borderColor = [UIColor grayColor].CGColor;
+    [sender setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    sender.titleLabel.text =[NSString stringWithFormat:@" 重新获取(30秒) "];
+    [sender setTitle:@" 重新获取(30秒) " forState:UIControlStateNormal];
+    _Timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(countDown) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] run];
+    
+}
+
+- (void)countDown{
+    _countdown --;
+    _vertifyButton.titleLabel.text =[NSString stringWithFormat:@" 重新获取(%d秒) ",_countdown];
+    [_vertifyButton setTitle:[NSString stringWithFormat:@" 重新获取(%d秒) ",_countdown] forState:UIControlStateNormal];
+    if (_countdown == 0) {
+        [_Timer invalidate];
+        [_vertifyButton setTitle:@" 获取验证码 " forState:UIControlStateNormal];
+        _vertifyButton.userInteractionEnabled = YES;
+        _vertifyButton.layer.borderColor = RGBCOLOR(26, 121, 202).CGColor;
+        [_vertifyButton setTitleColor:RGBCOLOR(26, 121, 202) forState:UIControlStateNormal];
+    }
+}
+
+- (void)requestCode{
+   
+    if(_firstTF.text.length>0){
+    NSString * url = [NSString stringWithFormat:getCode,_firstTF.text,@"password",arc4random()%10000];
+    
+    [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+        dic = json[@"data"][0];
+        NSLog(@"%@",json);
+        _vertify = [NSString stringWithFormat:@"%@",dic[@"verify"]];
+        NSLog(@"%@",_vertify);
+        _secondTF.text = _vertify;
+        
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.mode = MBProgressHUDModeText;
+        hud.label.text = @"您的网络不给力!";
+        [hud hideAnimated:YES afterDelay:2];
+    }];
+    }else{
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.mode = MBProgressHUDModeText;
+        hud.label.text = @"请输入手机号";
+        [hud hideAnimated:YES afterDelay:1];
+    }
+}
+
+- (IBAction)redefinePw:(UIButton *)sender {
+    NSString *url = [NSString stringWithFormat:@"%@api.php?mod=member&act=info&method=password",globleURL_prefix];
+    NSDictionary *dicuser = [[LYCUserManager informationDefaultUser] getUserInfoDic];
+    NSLog(@"%@",dicuser[PCUserPhone]);
+    NSMutableDictionary *mutDic = @{}.mutableCopy;
+    [mutDic setObject:_thirdTF.text forKey:@"password"];
+    [mutDic setObject:_forthTG.text forKey:@"re_password"];
+    [mutDic setObject:_secondTF.text forKey:@"verify"];
+    [mutDic setObject:_firstTF.text forKey:@"username"];
+    [[CDAFNetWork sharedMyManager] post:url params:mutDic success:^(id json) {
+        if([json[@"msg"] isEqualToString:@"成功"]){
+            NSDictionary *personDic = [[LYCUserManager informationDefaultUser] getUserInfoDic];
+            
+//            NSMutableDictionary *infoDic = [NSMutableDictionary dictionaryWithDictionary:personDic];
+//            [infoDic setObject:_forthTG.text forKey:PCUserPassword];
+//            [infoDic setObject:_firstTF.text forKey:PCUserPhone];
+//            [[LYCUserManager informationDefaultUser] loginWithDictionary:infoDic];
+//            [[LYCUserManager info rmationDefaultUser] autoLogin];
+            
+            self.blocked();
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }else{
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            hud.mode = MBProgressHUDModeText;
+            hud.label.text = json[@"msg"];
+            [hud hideAnimated:YES afterDelay: 1];
+        }
+        NSLog(@"%@",json[@"msg"]);
+        
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+    }];
+}
+
+
+@end

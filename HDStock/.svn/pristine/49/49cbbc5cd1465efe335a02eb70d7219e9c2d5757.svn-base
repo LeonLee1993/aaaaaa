@@ -1,0 +1,110 @@
+//
+//  HDPersonChangePasswordViewController.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/11/16.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDPersonChangePasswordViewController.h"
+
+@interface HDPersonChangePasswordViewController () 
+@property (weak, nonatomic) IBOutlet UIButton *vertifyButton;
+@property (nonatomic,assign) NSInteger countdown;
+@property (nonatomic, strong) NSTimer *Timer;//倒计时
+@end
+
+@implementation HDPersonChangePasswordViewController{
+    NSString *_vertify;
+    NSDictionary *dic;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setUp];
+}
+
+- (void) setUp {
+    self.title = @"修改密码";
+    [self setNormalBackNav];
+    _certificationCodeTF.clearButtonMode = UITextFieldViewModeWhileEditing;
+    _NewPWTF.clearButtonMode = UITextFieldViewModeWhileEditing;
+    _ReAssumPWTF.clearButtonMode = UITextFieldViewModeWhileEditing;
+}
+
+- (IBAction)getSCodeButtonClicked:(UIButton *)sender {
+    _vertifyButton.userInteractionEnabled = NO;
+    _countdown = 30;
+    [self requestCode];
+    sender.layer.borderColor = [UIColor grayColor].CGColor;
+    [sender setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    sender.titleLabel.text =[NSString stringWithFormat:@" 重新获取(30秒) "];
+    [sender setTitle:@" 重新获取(30秒) " forState:UIControlStateNormal];
+    _Timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(countDown) userInfo:nil repeats:YES];
+}
+
+- (void)requestCode{
+    NSDictionary *diction = [[LYCUserManager informationDefaultUser] getUserInfoDic];
+    NSString * url = [NSString stringWithFormat:getCode,diction[PCUserPhone],@"password",arc4random()%10000];
+    
+    [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+        dic = json[@"data"][0];
+        NSLog(@"%@",json);
+        _vertify = [NSString stringWithFormat:@"%@",dic[@"verify"]];
+        NSLog(@"%@",_vertify);
+        _certificationCodeTF.text = _vertify;
+        
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.mode = MBProgressHUDModeText;
+        hud.label.text = @"您的网络不给力!";
+        [hud hideAnimated:YES afterDelay: 2];
+    }];
+}
+
+
+- (void)countDown{
+    _countdown --;
+    _vertifyButton.titleLabel.text =[NSString stringWithFormat:@" 重新获取(%ld秒) ",(long)_countdown];
+    [_vertifyButton setTitle:[NSString stringWithFormat:@" 重新获取(%ld秒) ",(long)_countdown] forState:UIControlStateNormal];
+    if (_countdown == 0) {
+        [_Timer invalidate];
+        [_vertifyButton setTitle:@" 获取验证码 " forState:UIControlStateNormal];
+        _vertifyButton.userInteractionEnabled = YES;
+        _vertifyButton.layer.borderColor = RGBCOLOR(26, 121, 202).CGColor;
+        [_vertifyButton setTitleColor:RGBCOLOR(26, 121, 202) forState:UIControlStateNormal];
+    }
+}
+
+
+- (IBAction)redefinePw:(UIButton *)sender {
+    NSString *url = URL_ChangePW;
+    NSDictionary *dicuser = [[LYCUserManager informationDefaultUser] getUserInfoDic];
+    NSMutableDictionary *mutDic = @{}.mutableCopy;
+    [mutDic setObject:_NewPWTF.text forKey:@"password"];
+    [mutDic setObject:_ReAssumPWTF.text forKey:@"re_password"];
+    [mutDic setObject:_certificationCodeTF.text forKey:@"verify"];
+    [mutDic setObject:dicuser[PCUserPhone] forKey:@"username"];
+    [[CDAFNetWork sharedMyManager] post:url params:mutDic success:^(id json) {
+        if([json[@"msg"] isEqualToString:@"密码修改成功"]){
+            NSDictionary *personDic = [[LYCUserManager informationDefaultUser] getUserInfoDic];
+            NSMutableDictionary *infoDic = [NSMutableDictionary dictionaryWithDictionary:personDic];
+            [infoDic setObject:_ReAssumPWTF.text forKey:PCUserPassword];
+            [[LYCUserManager informationDefaultUser] loginWithDictionary:infoDic];
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }else{
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            hud.mode = MBProgressHUDModeText;
+            hud.label.text = json[@"msg"];
+            [hud hideAnimated:YES afterDelay: 1];
+        }
+        NSLog(@"%@",json[@"msg"]);
+
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+    }];
+}
+
+
+@end

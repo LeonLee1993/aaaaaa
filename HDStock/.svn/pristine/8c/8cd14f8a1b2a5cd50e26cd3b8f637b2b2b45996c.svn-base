@@ -1,0 +1,56 @@
+//
+//  PCMCThirdViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "PCMCThirdViewController.h"
+#import "PCMCThirdTableViewCell.h"
+
+@interface PCMCThirdViewController ()<UITableViewDataSource,UITableViewDelegate>
+@property (nonatomic,strong) UITableView * tableView1;
+
+@end
+
+@implementation PCMCThirdViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    if(!self.tableView1){
+        self.tableView1 = [[UITableView alloc]init];
+    }
+    [self setNavDicWithTitleFont:17 titleColor:[UIColor whiteColor] title:@"活动消息"];
+    // Do any additional setup after loading the view.
+    [self setNavCustemViewForLeftItemWithImage:imageNamed(@"Live_back") title:@"返回" titleFont:[UIFont systemFontOfSize:(15)] titleCoclor:[UIColor clearColor] custemViewFrame:CGRM(0, 26, 56, 44)];
+    [self setTableView];
+}
+
+- (void)setTableView{
+    self.tableView1.delegate = self;
+    self.tableView1.dataSource = self;
+    self.tableView1.backgroundColor = BACKGROUNDCOKOR;
+    self.tableView1.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"PCMCThirdTableViewCell" bundle:nil] forCellReuseIdentifier:@"PCMCThirdTableViewCell"];
+    self.tableView1.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-64);
+    [self.view addSubview:_tableView1];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 5;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    PCMCThirdTableViewCell *tableViewCell = [tableView dequeueReusableCellWithIdentifier:@"PCMCThirdTableViewCell"];
+    tableViewCell.selectionStyle = UITableViewCellSelectionStyleNone;
+//    tableViewCell.messageLabel.text =  @"老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！";
+    return tableViewCell;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return SCREEN_WIDTH/375*186;
+}
+
+
+@end

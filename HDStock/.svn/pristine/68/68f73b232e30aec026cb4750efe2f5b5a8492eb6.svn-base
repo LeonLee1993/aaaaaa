@@ -1,0 +1,73 @@
+//
+//  buiedProductListViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/13.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "buiedProductListViewController.h"
+#import "BuiedPruductTableViewCell.h"
+#import "BuiedProductDetailViewController.h"
+
+@interface buiedProductListViewController ()<UITableViewDataSource,UITableViewDelegate>
+@property (nonatomic,strong) UITableView *tableView1;
+@end
+
+@implementation buiedProductListViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    if(!self.tableView1){
+        self.tableView1 = [[UITableView alloc]init];
+    }
+    [self setNavDicWithTitleFont:17 titleColor:[UIColor whiteColor] title:@"项目服务"];
+    
+    [self setNavCustemViewForLeftItemWithImage:imageNamed(@"Live_back") title:@"返回" titleFont:[UIFont systemFontOfSize:(15)] titleCoclor:[UIColor clearColor] custemViewFrame:CGRM(0, 26, 56, 44)];
+    [self setTableView];
+}
+
+- (void)setTableView{
+    self.tableView1.delegate = self;
+    self.tableView1.dataSource = self;
+    self.tableView1.backgroundColor = BACKGROUNDCOKOR;
+    self.tableView1.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"BuiedPruductTableViewCell" bundle:nil] forCellReuseIdentifier:@"BuiedPruductTableViewCell"];
+    self.tableView1.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-64);
+    [self.view addSubview:_tableView1];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 5;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    BuiedPruductTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"BuiedPruductTableViewCell"];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    NSMutableParagraphStyle *style1 = [[NSMutableParagraphStyle alloc] init];
+    style1.headIndent = 0;
+    style1.firstLineHeadIndent = 0;
+    style1.lineSpacing = 9;
+    NSAttributedString * string = [[NSAttributedString alloc]initWithString:@"老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！" attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:style1}];
+    cell.text.attributedText = string;
+    return cell;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSString * tempStr = @"老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！";
+    NSMutableParagraphStyle *style1 = [[NSMutableParagraphStyle alloc] init];
+    style1.headIndent = 0;
+    style1.firstLineHeadIndent = 0;
+    style1.lineSpacing = 9;
+    CGSize secondDesc = [tempStr boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:style1} context:nil].size;
+    return 130+secondDesc.height-15;
+}
+
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    BuiedProductDetailViewController *detail = [[BuiedProductDetailViewController alloc]init];
+    [self.navigationController pushViewController:detail animated:YES];
+}
+
+
+@end

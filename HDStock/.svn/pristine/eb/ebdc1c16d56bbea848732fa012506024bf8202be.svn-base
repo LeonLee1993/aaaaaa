@@ -1,0 +1,190 @@
+//
+//  HDOnlyFaViewController.m
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/15.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDOnlyFaViewController.h"
+#import "ATCarouselView.h"
+#import "YJSegmentedControl.h"
+
+static NSInteger segmentselected = 0;
+
+@interface HDOnlyFaViewController ()<UITableViewDelegate,UITableViewDataSource,YJSegmentedControlDelegate>
+
+@property (nonatomic, strong) UITableView * tableview;
+
+@end
+
+@implementation HDOnlyFaViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setupTableview];
+    
+}
+
+- (void)viewWillLayoutSubviews{
+    [super viewWillLayoutSubviews];
+    
+    _tableview.frame = self.view.bounds;
+    
+}
+
+- (void)setupTableview{
+
+    _tableview = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
+    
+    _tableview.delegate = self;
+    
+    _tableview.dataSource = self;
+    
+    _tableview.showsVerticalScrollIndicator = NO;
+
+    [self.view addSubview:_tableview];
+
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+
+    if (segmentselected == 0) {
+        
+        return 10;
+        
+    }else if (segmentselected == 1){
+        
+        return 20;
+        
+    }else if (segmentselected == 2){
+        
+        return 30;
+        
+    }
+
+    return 10;
+
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+
+    return 80;
+
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+
+    if (segmentselected == 0) {
+        UITableViewCell * cell = [_tableview dequeueReusableCellWithIdentifier:@"cell4"];
+        
+        if(!cell){
+            
+            cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell4"];
+            
+        }
+        cell.backgroundColor = arcColor;
+        cell.textLabel.text = [NSString stringWithFormat:@"%ld",indexPath.row];
+        return cell;
+    }else if (segmentselected == 1){
+        UITableViewCell * cell = [_tableview dequeueReusableCellWithIdentifier:@"cell5"];
+        
+        if(!cell){
+            
+            cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell5"];
+            
+        }
+    cell.backgroundColor = COLOR(cyanColor);
+       cell.textLabel.text = [NSString stringWithFormat:@"%ld",indexPath.row];
+        return cell;
+    }else if (segmentselected == 2){
+        UITableViewCell * cell = [_tableview dequeueReusableCellWithIdentifier:@"cell6"];
+        
+        if(!cell){
+            
+            cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell6"];
+            
+        }
+    cell.backgroundColor = COLOR(blueColor);
+       cell.textLabel.text = [NSString stringWithFormat:@"%ld",indexPath.row];
+        return cell;
+    }
+    UITableViewCell * cell = [_tableview dequeueReusableCellWithIdentifier:@"cells"];
+    
+    if(!cell){
+        
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cells"];
+        
+    }
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+    cell.textLabel.text = [NSString stringWithFormat:@"%ld",indexPath.row];
+
+    return cell;
+
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    
+    return 40;
+    
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+
+    NSArray * btnDataSource = @[@"股评", @"观点",@"抓牛股"];
+    
+    YJSegmentedControl * segment = [YJSegmentedControl segmentedControlFrame:CGRM(0, 0,SCREEN_SIZE_WIDTH , 40) titleDataSource:btnDataSource backgroundColor:[UIColor whiteColor] titleColor:[UIColor blackColor] titleFont:systemFont(17) selectColor:MAIN_COLOR buttonDownColor:MAIN_COLOR Delegate:self selectSeg:segmentselected withViewLine:NO];
+    
+    segment.backgroundColor = BACKGROUNDCOKOR;
+    
+    return segment;
+
+}
+
+- (void)segumentSelectionChange:(UIButton *)selection{
+    
+    if (selection.tag == 1200) {
+        
+        segmentselected = 0;
+        
+    }else if (selection.tag == 1201){
+        
+        segmentselected = 1;
+        
+    }else if (selection.tag == 1202){
+        
+        segmentselected = 2;
+        
+    }
+    
+    [UIView performWithoutAnimation:^{
+        
+        [self.tableview reloadData];
+        
+//        [self.tableview selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionTop];
+//        
+    }];
+
+   
+
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

@@ -1,0 +1,50 @@
+//
+//  HDPersonChangeNameViewController.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/11/16.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDPersonChangeNameViewController.h"
+
+@interface HDPersonChangeNameViewController ()
+
+@end
+
+@implementation HDPersonChangeNameViewController
+
+- (void)viewDidLoad {
+    
+    [super viewDidLoad];
+    [self setUp];
+    [self setNormalBackNav];
+    
+}
+
+- (void) setUp {
+    self.textBgViewToSelfViewVerSpace.constant = 25*WIDTH;
+    self.saveBtnToTextBgViewVerSpace.constant = 25*WIDTH;
+    _nameTextFild.clearButtonMode = UITextFieldViewModeWhileEditing;
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(goBackTo)];
+    [_goBackView addGestureRecognizer:tap];
+}
+
+- (void)goBackTo{
+    [self dismissViewControllerAnimated:NO completion:nil];
+}
+
+- (IBAction)saveBtnClicked:(UIButton *)sender {
+    if (self.nameTextFild.text.length > 0) {
+        if (self.changNickNameBlock) {
+            self.changNickNameBlock(self.nameTextFild.text);
+        }
+        [self dismissViewControllerAnimated:NO completion:nil];
+    }else {
+        [MBProgressHUD showAutoMessage:@"请输入昵称"];
+    }
+    
+}
+
+
+@end

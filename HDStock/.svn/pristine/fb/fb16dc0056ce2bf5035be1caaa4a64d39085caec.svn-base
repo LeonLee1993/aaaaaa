@@ -1,0 +1,214 @@
+//
+//  HDLiveViewController.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/11/15.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDLiveViewController.h"
+#import "HDLiveInerViewController.h"
+#import "HDLiveTableViewCell.h"
+
+static NSString * reuseId = @"LiveTBCell";
+
+@interface HDLiveViewController ()<UITableViewDelegate,UITableViewDataSource> {
+    UITableView * _tb;
+    NSTimer * timerZ;
+}
+
+@end
+
+@implementation HDLiveViewController
+
+
+//直播
+NSString*const accessKeyID = @"QxJIheGFRL926hFX";
+NSString*const accessKeySecret = @"hipHJKpt0TdznQG2J4D0EVSavRH7mR";
+
+-(AliVcAccesskey*)getAccessKeyIDSecret
+{
+    AliVcAccesskey* accessKey = [[AliVcAccesskey alloc] init];
+    accessKey.accessKeyId = accessKeyID;
+    accessKey.accessKeySecret = accessKeySecret;
+    return accessKey;
+}
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setUp];
+    [self setNav];
+    [self createTB];
+    //直播
+    [AliVcMediaPlayer setAccessKeyDelegate:self];
+//    [self addNetWorkCheckObserver];
+    
+}
+- (void) setNav {
+    self.title = @"直播";
+    
+    
+}
+- (void) setUp {
+    self.view.backgroundColor = UICOLOR(238, 238, 245, 1);
+}
+
+//- (void) addNetWorkCheckObserver {
+//    
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(netWorkChanged:)
+//                                                 name:NETWORKSTATUE object:self];
+//}
+//
+//-(void)removeNetWorkCheckObserver
+//{
+//    [[NSNotificationCenter defaultCenter] removeObserver:self
+//                                                    name:NETWORKSTATUE object:self];
+//}
+//- (void) viewWillDisappear:(BOOL)animated {
+//    [super viewWillDisappear:animated];
+//    [self removeNetWorkCheckObserver];
+//}
+//- (void) netWorkChanged:(NSNotification *) note {
+//    NSLog(@"note=%@",note);
+//}
+#pragma mark - 创建表格
+- (void ) createTB {
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    UITableView * tb = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_SIZE_WIDTH, SCREEN_SIZE_HEIGHT-TABBAR_HEIGHT+20) style:(UITableViewStyleGrouped)];
+    tb.tableHeaderView = [[UIView alloc] initWithFrame:CGRM(0, 0, SCREEN_WIDTH, 0.1f)];
+    tb.separatorStyle = UITableViewCellSeparatorStyleNone;
+    tb.showsVerticalScrollIndicator = NO;
+    tb.delegate = self;
+    tb.dataSource = self;
+    tb.bounces = NO;
+    _tb = tb;
+    [self.view addSubview:_tb];
+    
+    [self registCell];
+    
+    _tb.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{//下拉刷新
+//        [self requestOfRankList];
+    }];
+    _tb.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        
+    }];
+//
+//    [_tb.mj_header beginRefreshing];
+}
+- (void) registCell {
+    [_tb registerNib:[UINib nibWithNibName:@"HDLiveTableViewCell" bundle:nil] forCellReuseIdentifier:reuseId];
+    
+}
+
+#pragma mark - UITableViewDelegate
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
+    return 10;
+}
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 1;
+}
+-(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    HDLiveTableViewCell * cell = [tableView cellForRowAtIndexPath:indexPath];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"HDLiveTableViewCell" owner:self options:nil] lastObject];
+    }
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+#warning 这里要改直播状态和关注状态
+    if (indexPath.section==0) {
+        [cell.careBtn setTitle:@"关注" forState:(UIControlStateNormal)];
+        //        cell.careBtn.titleLabel.text = @" 关注 ";
+        cell.LiveStatusLal.text = @"视屏直播中";
+        cell.LiveRoomLab.text = @"财青社";
+    }else if (indexPath.section==1) {
+        [cell.careBtn setTitle:@" 关注 " forState:(UIControlStateNormal)];
+        cell.LiveStatusLal.text = @"直播中";
+    }else {
+        //        cell.careBtn.titleLabel.text = @" 已关注 ";
+        [cell.careBtn setTitle:@"已关注" forState:(UIControlStateNormal)];
+        [cell.careBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        cell.careBtn.layer.borderColor = LINE_COLOR.CGColor;
+        cell.LiveStatusLal.text = @"未直播";
+        cell.LiveStatusLal.backgroundColor = UICOLOR(221, 221, 221, 1);
+        cell.LiveStatusLal.textColor = COLOR(grayColor);
+    }
+    
+    return cell;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 150;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    
+    return 0.1f;
+    
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    
+    if (section == 0){
+        return 10.f;
+    }
+    return 8.f;
+}
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    
+    HDLiveInerViewController * vc = [HDLiveInerViewController new];
+    
+    if (indexPath.section == 0) {//视屏直播
+        
+        vc.liveStatus = 1;
+        //设置直播网址链接
+        [self setVedioPlayUrlWithVC:vc];
+        [self.navigationController pushViewController:vc animated:NO];
+
+    }else if (indexPath.section == 1) {//文字直播
+        
+        vc.liveStatus = 2;
+        [self.navigationController pushViewController:vc animated:NO];
+        
+    }else{//未直播
+        
+        vc.liveStatus = 3;
+    }
+    
+    
+    
+
+}
+
+- (void) setVedioPlayUrlWithVC:(HDLiveInerViewController*)vc {
+    //    NSURL* url = [NSURL URLWithString:@"rtmp://live.hkstv.hk.lxdns.com/live/hks"];
+    NSURL* url = [NSURL URLWithString:@"http://dscj.oss-cn-shanghai.aliyuncs.com/record/dscj/dscj_73.m3u8"];
+    if (url == nil) {
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"错误" message:@"输入地址无效" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        
+        [alter show];
+        return;
+    }
+    
+    [vc SetMoiveSource:url];
+}
+
+
+#pragma mark - foo
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

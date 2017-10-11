@@ -1,0 +1,22 @@
+//
+//  PCMyPlanViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/14.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "PCMyPlanViewController.h"
+
+@interface PCMyPlanViewController ()
+
+@end
+
+@implementation PCMyPlanViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+}
+
+@end

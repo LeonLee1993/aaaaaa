@@ -1,0 +1,33 @@
+//
+//  AppDelegate.h
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import <CoreData/CoreData.h>
+#import "HDLeftPersonalViewController.h"
+
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
+
+@property (strong, nonatomic) UIWindow *window;
+
+@property (readonly, strong) NSPersistentContainer *persistentContainer;
+
+/**是否支持屏幕旋转,1可以旋转，其他不可以*/
+@property (nonatomic, assign) NSInteger allowRotation;
+
+/**网络状态*/
+@property (nonatomic,assign) NSInteger netStatu;
+
+
+- (void)saveContext;
+
+@property (nonatomic,strong) HDLeftPersonalViewController *leftSideVc;
+@property (nonatomic,strong) UITabBarController *mainVc;
+
+
+@end
+

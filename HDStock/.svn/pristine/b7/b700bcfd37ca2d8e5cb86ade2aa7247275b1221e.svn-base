@@ -1,0 +1,113 @@
+//
+//  HDVideoDetailsViewController.m
+//  HDStock
+//
+//  Created by hd-app02 on 2016/11/24.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDVideoDetailsViewController.h"
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
+#import "ZFPlayer.h"
+
+@interface HDVideoDetailsViewController ()<ZFPlayerDelegate>
+
+@property (strong, nonatomic) IBOutlet UIView *TopStatusView;
+/** 播放器View的父视图*/
+@property (strong, nonatomic) IBOutlet UIView *playerFatherView;
+@property (strong, nonatomic) ZFPlayerView *playerView;
+/** 离开页面时候是否在播放 */
+@property (nonatomic, assign) BOOL isPlaying;
+@property (nonatomic, strong) ZFPlayerModel *playerModel;
+@property (nonatomic, strong) UIView *bottomView;
+
+@end
+
+@implementation HDVideoDetailsViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.view.backgroundColor = COLOR(whiteColor);
+    
+    //self.TopStatusView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 20)];
+    self.TopStatusView.backgroundColor = MAIN_COLOR;
+    
+    self.playerView = [[ZFPlayerView alloc] init];
+    //self.playerFatherView = [[UIView alloc] initWithFrame:CGRectMake(0, 20, self.view.bounds.size.width, 210)];
+   
+    [self.view addSubview:_TopStatusView];
+    [self.view addSubview:self.playerFatherView];
+    [self.playerFatherView addSubview:self.playerView];
+    [self.playerFatherView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(20);
+        make.leading.trailing.mas_equalTo(0);
+        make.height.mas_equalTo(self.playerFatherView.mas_width).multipliedBy(9.0f/16.0f);
+    }];
+    [self.playerView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.mas_offset(UIEdgeInsetsZero);
+    }];
+    
+    ZFPlayerControlView *controlView = [[ZFPlayerControlView alloc] init];
+
+    [self.playerView playerControlView:controlView playerModel:self.playerModel];
+
+    self.playerView.delegate = self;
+    
+
+}
+
+#pragma mark - ZFPlayerDelegate
+
+- (void)zf_playerBackAction
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+#pragma mark - Getter
+
+- (ZFPlayerModel *)playerModel
+{
+    if (!_playerModel) {
+        _playerModel                  = [[ZFPlayerModel alloc] init];
+        _playerModel.videoURL         = [NSURL URLWithString:self.videoUrl];
+        _playerModel.placeholderImageURLString = self.picUrl;
+        _playerModel.fatherView       = self.playerFatherView;
+        
+    }
+    return _playerModel;
+}
+
+
+
+- (void)viewWillAppear:(BOOL)animated{
+    
+    [self.navigationController.navigationBar setHidden:YES];
+    
+}
+
+- (void)viewDidDisappear:(BOOL)animated{
+
+    [self.tabBarController.tabBar setHidden:NO];
+    
+    [self.navigationController.navigationBar setHidden:NO];
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

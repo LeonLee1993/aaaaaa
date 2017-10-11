@@ -1,0 +1,38 @@
+//
+//  HDSegmentView.h
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/17.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "ZJScrollSegmentView.h"
+
+typedef NS_ENUM(NSInteger, KindOfTableView) {
+    
+    KindOfTableViewRecommend = 0,
+    KindOfTableViewTwo,
+    KindOfTableViewThree,
+    
+};
+
+@protocol HDSegmentViewDelegate <NSObject>
+
+@optional
+
+- (void)addButtonForScrollSegmentsOnClicked:(UIButton *)button toPushToController:(UIViewController *)viewController;
+
+- (void)reloadSegmentView;
+
+@end
+
+@interface HDSegmentView : UIView<ZJScrollPageViewDelegate>
+
+@property (nonatomic, strong) ZJScrollSegmentView * segmentView;
+
+@property (nonatomic, strong) NSMutableArray * titleArray;
+
+@property (nonatomic, weak) id <HDSegmentViewDelegate> delegate;
+
+@end

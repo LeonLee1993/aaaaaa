@@ -1,0 +1,137 @@
+//
+//  HDLiveChateViewController.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/11/14.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDLiveChateViewController.h"
+#import <WebKit/WebKit.h>
+
+@interface HDLiveChateViewController ()<WKNavigationDelegate>{
+    WKWebView * wkWeb;
+}
+
+
+@end
+
+@implementation HDLiveChateViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.view.backgroundColor = COLOR(whiteColor);
+    [self createWkWeb];
+    
+//    [self fitFrame];
+}
+
+
+- (void) fitFrame {
+    CGRect frame = self.view.frame;
+    frame.size.height = SCREEN_HEIGHT-NAV_STATUS_HEIGHT-180;
+    self.view.frame = frame;
+}
+
+- (void) createWkWeb {
+    
+    [self deleteWebCache];
+    
+    wkWeb = [[WKWebView alloc] initWithFrame:CGRM(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-NAV_STATUS_HEIGHT-173)];
+    
+    wkWeb.navigationDelegate = self;
+    [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://test.cdtzb.com/liveroom.php?type=chat"]]];
+    wkWeb.scrollView.showsVerticalScrollIndicator = NO;
+    wkWeb.backgroundColor = BACKGROUNDCOKOR;
+    [self.view addSubview:wkWeb];
+    
+}
+
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+//    [MBProgressHUD showLoadToView:self.view];
+}
+- (void) webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+//    [MBProgressHUD hideHUDForView:self.view animated:YES];
+}
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    NSLog(@"%@",error);
+}
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    NSLog(@"%@",error);
+}
+
+- (void)deleteWebCache {
+
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 9.0) {
+        
+        NSSet *websiteDataTypes
+        
+        = [NSSet setWithArray:@[
+                                
+                                WKWebsiteDataTypeDiskCache,
+                                
+                                //WKWebsiteDataTypeOfflineWebApplicationCache,
+                                
+                                WKWebsiteDataTypeMemoryCache,
+                                
+                                //WKWebsiteDataTypeLocalStorage,
+                                
+                                //WKWebsiteDataTypeCookies,
+                                
+                                //WKWebsiteDataTypeSessionStorage,
+                                
+                                //WKWebsiteDataTypeIndexedDBDatabases,
+                                
+                                //WKWebsiteDataTypeWebSQLDatabases
+                                
+                                ]];
+        
+        //// All kinds of data
+        
+        //NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
+        
+        //// Date from
+        
+        NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+        
+        //// Execute
+        
+        [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
+            
+            // Done
+            
+        }];
+        
+        
+        
+    } else {
+        
+        NSString *libraryPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        
+        NSString *cookiesFolderPath = [libraryPath stringByAppendingString:@"/Cookies"];
+        
+        NSError *errors;
+        
+        [[NSFileManager defaultManager] removeItemAtPath:cookiesFolderPath error:&errors];
+ 
+    }
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

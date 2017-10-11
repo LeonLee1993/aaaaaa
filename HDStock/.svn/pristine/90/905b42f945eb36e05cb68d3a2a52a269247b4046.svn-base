@@ -1,0 +1,228 @@
+//
+//  HDHomePageViewController.m
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDHomePageViewController.h"
+
+@interface HDHomePageViewController ()<UITableViewDataSource,UITableViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UITableView *mainTableView;
+
+@property (nonatomic, assign) BOOL isTopAndCanNotMoveMainTabView;
+@property (nonatomic, assign) BOOL isTopAndCanNotMoveTabView;
+@property (nonatomic, assign) BOOL canScroll;
+
+@end
+
+
+static NSString *const kGoTopNotificationName = @"goTop";//进入置顶命令
+static NSString *const kLeaveTopNotificationName = @"leaveTop";//离开置顶命令
+
+static NSInteger segmentSelection = 0;
+
+@implementation HDHomePageViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setUpTableView];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(acceptMsg:) name:kLeaveTopNotificationName object:nil];
+    
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)setUpTableView{
+
+    _mainTableView.dataSource = self;
+    
+    _mainTableView.delegate = self;
+    
+}
+
+#pragma mark === tableview data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+
+    return 3;
+
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+
+    switch (section) {
+        case 0:
+            return 1;
+            break;
+        case 1:
+            return 1;
+            break;
+        case 2:
+            return 1;
+            break;
+            
+        default:
+            break;
+    }
+    
+    return 0;
+
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+
+    switch (indexPath.section) {
+        case 0:
+            return 300;
+            break;
+        case 1:
+            return 200;
+            break;
+        case 2:
+            return SCREEN_HEIGHT - TABBAR_HEIGHT - NAV_HEIGHT;
+            break;
+            
+        default:
+            break;
+    }
+    
+    return 0;
+
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+
+    switch (section) {
+        case 0:
+            return 10;
+            break;
+        case 1:
+            return 10;
+            break;
+        default:
+            break;
+    }
+    
+    return 0;
+
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if (indexPath.section == 2) {
+        
+        HDHomeBottomCell * cell = [[HDHomeBottomCell alloc]init];
+        
+        return cell;
+        
+    }
+
+    UITableViewCell * cell = [_mainTableView dequeueReusableCellWithIdentifier:@"cell"];
+    
+    if (!cell) {
+        
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+    }
+    
+    cell.backgroundColor = UICOLOR(arc4random()%300, arc4random()%300, arc4random()%300, arc4random()%300);
+    
+    cell.textLabel.text = [NSString stringWithFormat:@"%@",indexPath];
+    
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    
+    if (section == 2) {
+        
+        return 50;
+        
+    }
+    
+    return 0;
+    
+}
+
+- (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    
+    if (section == 2) {
+        
+        NSArray * btnDataSource = @[@"精选", @"快讯",@"日历"];
+        
+        YJSegmentedControl * segment = [YJSegmentedControl segmentedControlFrame:CGRM(0, 0,SCREEN_SIZE_WIDTH , 50) titleDataSource:btnDataSource backgroundColor:[UIColor whiteColor] titleColor:[UIColor blackColor] titleFont:systemFont(18) selectColor:MAIN_COLOR buttonDownColor:MAIN_COLOR Delegate:self selectSeg:segmentSelection];
+        
+        return segment;
+        
+    }
+    
+    return nil;
+}
+
+
+#pragma mark - UISCrollviewDelegate
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    
+//    CGFloat tabOffsetY = [_mainTableView rectForSection:2].origin.y-64;
+//    
+//    CGFloat offsetY = scrollView.contentOffset.y;
+    
+
+}
+
+-(void)acceptMsg : (NSNotification *)notification{
+    
+    
+}
+
+//头条快讯切换
+- (void)segumentSelectionChange:(UIButton *)selection{
+    
+    if (selection.tag == 1) {
+        
+        segmentSelection = 0;
+        
+    }else if (selection.tag == 2){
+        
+        segmentSelection = 1;
+        
+    }else if (selection.tag == 3){
+        
+        segmentSelection = 2;
+        
+    }
+    
+//    [UIView performWithoutAnimation:^{
+//        
+//        [self.tableView reloadSection:3 withRowAnimation:UITableViewRowAnimationNone];
+//        
+//    }];
+//    
+//    [self.tableView scrollToRow:0 inSection:3 atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

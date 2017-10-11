@@ -1,0 +1,50 @@
+//
+//  HDMiddleCell.m
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/11.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDMiddleCell.h"
+
+@implementation HDMiddleCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+    _psyScrollButtonView.titleArray = @[@"中国十大财经名博 每天7点精准测大盘",@"中国十大财经名博 每天7点精准测大盘",@"中国十大财经名博 每天7点精准测大盘",@"按钮"];
+    
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(36, 36), NO, 0.0);
+    UIImage *blank = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    
+    _psyScrollButtonView.imageArray = @[imageNamed(@"zhibo1"),imageNamed(@"zhibo2"),imageNamed(@"zhibo3"),blank];
+
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+- (void)layoutSubviews{
+
+    [super layoutSubviews];
+    
+    CALayer * layerBottom = [CALayer layer];
+    float height = self.titleLabel.frame.size.height-1.0f;
+    float width = self.titleLabel.frame.size.width;
+    
+    layerBottom.frame = CGRectMake(0.0f, height, width, 1.0f);
+    layerBottom.backgroundColor = LINE_COLOR.CGColor;
+    
+    [self.titleLabel.layer addSublayer:layerBottom];
+
+}
+
+
+@end

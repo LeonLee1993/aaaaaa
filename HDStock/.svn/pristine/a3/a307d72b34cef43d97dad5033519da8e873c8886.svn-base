@@ -1,0 +1,374 @@
+//
+//  HDAdversementDetailViewController.m
+//  HDStock
+//
+//  Created by hd-app02 on 2016/12/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDAdversementDetailViewController.h"
+#import <WebKit/WebKit.h>
+#import <CommonCrypto/CommonDigest.h>
+#import "ZHFactory.h"
+
+static NSString * const isPraised = @"isPraised.plist";
+@interface HDAdversementDetailViewController()<WKUIDelegate, WKNavigationDelegate, UIWebViewDelegate>
+
+@property (strong, nonatomic) UIView * bottomView;
+@property (strong, nonatomic) UIButton *collectionButton;
+@property (strong, nonatomic) UIButton *shareButton;
+@property (strong, nonatomic) UIButton *praiseButton;
+@property (assign, nonatomic) NSInteger favid;
+
+
+@property (nonatomic, strong) UIWebView * webView;
+@end
+
+@implementation HDAdversementDetailViewController
+
+- (void)viewDidLoad{
+    
+    [super viewDidLoad];
+    self.title = @"广告";
+    [self setNormalBackNav];
+    [self setUpTextView];
+    [self loadData];
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self.navigationController.navigationBar setHidden:NO];
+    
+}
+
+- (void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+    [self.tabBarController.tabBar setHidden:NO];
+    
+    [self.navigationController.navigationBar setHidden:YES];
+    
+}
+
+
+- (void)setUpTextView{
+    self.webView = [[UIWebView alloc] initWithFrame: CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height - NAV_STATUS_HEIGHT - 50)];
+    self.webView.backgroundColor = [UIColor whiteColor];
+    self.webView.opaque = NO;
+    self.webView.delegate = self;
+    
+    //如果你导入的MJRefresh库是最新的库，就用下面的方法创建下拉刷新和上拉加载事件
+    self.webView.scrollView.mj_header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(headerRefresh)];
+    self.webView.scrollView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(footerRefresh)];
+    [self.view addSubview:self.webView];
+    
+    self.bottomView = [[UIView alloc]initWithFrame:CGRectZero];
+    self.bottomView.backgroundColor = COLOR(whiteColor);
+    [self.view addSubview:self.bottomView];
+    [self.bottomView mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.bottom.right.left.equalTo(self.view);
+        make.height.mas_equalTo(50);
+    }];
+    
+    self.collectionButton = [[UIButton alloc]init];
+    [self.collectionButton setBackgroundImage:imageNamed(@"zixun_soucang_icon_xuanzhong") forState:UIControlStateNormal];
+    [self.collectionButton setBackgroundImage:imageNamed(@"zixun_soucang_icon_weixuanzhong") forState:UIControlStateSelected];
+    [self.bottomView addSubview:self.collectionButton];
+    [self.collectionButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(34, 34));
+        make.center.equalTo(self.bottomView);
+        
+    }];
+    
+    self.praiseButton = [[UIButton alloc]initWithFrame:CGRectZero];
+    [self.praiseButton setBackgroundImage:imageNamed(@"zixun_zan_icon_xuanzhong") forState:UIControlStateNormal];
+    [self.praiseButton setBackgroundImage:imageNamed(@"zixun_zan_icon_weixuanzhong") forState:UIControlStateSelected];
+    [self.bottomView addSubview:self.praiseButton];
+    [self.praiseButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(34, 34));
+        make.centerY.equalTo(self.bottomView);
+        make.right.equalTo(self.collectionButton.mas_left).with.offset(-74);
+        
+    }];
+    
+    self.shareButton = [[UIButton alloc]init];
+    [self.shareButton setBackgroundImage:imageNamed(@"zixun_share_icon") forState:UIControlStateNormal];
+    [self.bottomView addSubview:self.shareButton];
+    [self.shareButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(34, 34));
+        make.centerY.equalTo(self.bottomView);
+        make.left.equalTo(self.collectionButton.mas_right).with.offset(74);
+    }];
+    
+    [self.collectionButton addTarget:self action:@selector(collectionButtonOnTouched:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.shareButton addTarget:self action:@selector(praiseTheComment:) forControlEvents:UIControlEventTouchUpInside];
+    
+}
+
+#pragma mark - 下拉刷新
+- (void)headerRefresh{
+    
+    [self loadData];
+}
+
+#pragma mark - 上拉加载
+- (void)footerRefresh{
+    
+    [self loadData];
+}
+
+#pragma mark - 结束下拉刷新和上拉加载
+- (void)endRefresh{
+    
+    //当请求数据成功或失败后，如果你导入的MJRefresh库是最新的库，就用下面的方法结束下拉刷新和上拉加载事件
+    [self.webView.scrollView.mj_header endRefreshing];
+    [self.webView.scrollView.mj_footer endRefreshing];
+    
+}
+
+
+#pragma mark - 加载网页
+- (void)loadData{
+    
+    NSString * urlString = self.url;
+    
+    NSLog(@"广告%@",urlString);
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [self.webView loadRequest:request];
+}
+
+#pragma mark - UIWebViewDelegate
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationTyp{
+    
+    return YES;
+}
+- (void)webViewDidStartLoad:(UIWebView *)webView{
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView{
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    [self endRefresh];
+    
+    //    NSString *jsCode = [NSString stringWithFormat:@"$('')"];
+    //    [webView stringByEvaluatingJavaScriptFromString:jsCode];
+    
+}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    [self endRefresh];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)collectionButtonOnTouched:(UIButton *)button{
+    
+    if (button.selected == NO) {
+        
+        [self collectionTheArticle];
+        
+    }else if(button.selected == YES){
+        
+        [self cancelCollection];
+        
+    }
+    button.selected = !button.selected;
+    
+}
+//
+//
+//- (void)praiseTheComment:(UIButton * )button{
+//    
+//    NSString * hashString = [NSString stringWithFormat:@"%ld%ld",(long)self.uid,(long)self.aid];
+//    
+//    NSString * hashedStr = [self stringToMD5:hashString];
+//    NSLog(@"加密的%@",hashedStr);
+//    [self praiseTheArticleToNet:hashedStr];
+//    
+//}
+
+- (void)rightBarImageBtnClciked{
+    
+    NSLog(@"分享");
+    
+}
+- (void)collectionTheArticle{
+    
+    WEAK_SELF;
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    
+    NSString * url = [NSString stringWithFormat:CollectionTheArticle,(long)1,(long)1,arc4random()%1000];
+    
+    dispatch_async(queue, ^{
+        
+        STRONG_SELF;
+        
+        [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+            NSDictionary * dic = json[@"data"];
+            NSString * favaid = dic[@"favid"];
+            NSString * code = json[@"code"];
+            NSMutableDictionary * faDic = [ZHFactory readPlistWithPlistNameReturnMutableDictionary:isPraised];
+            [faDic setValue:favaid forKey:[NSString stringWithFormat:@"%d",1]];
+            if (code.integerValue == 1) {
+                [self plistHuanCunWithDic:faDic];
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.label.text = @"收藏成功!";
+                hud.label.textColor = COLOR(orangeColor);
+                [hud hideAnimated:YES afterDelay: 2];
+            }else if (code.integerValue == 100){
+                
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.label.text = @"请勿重复收藏!";
+                hud.label.textColor = COLOR(orangeColor);
+                [hud hideAnimated:YES afterDelay: 2];
+                
+            }
+            
+        } failure:^(NSError *error) {
+            
+            
+        }];
+        
+    });
+    
+    
+}
+
+- (void)cancelCollection{
+    
+    NSMutableDictionary * dic = [ZHFactory readPlistWithPlistNameReturnMutableDictionary:isPraised];
+    NSString * favid = dic[[NSString stringWithFormat:@"%d",1]];
+    self.favid = favid.integerValue;
+    WEAK_SELF;
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    
+    NSString * url = [NSString stringWithFormat:CancelCollection,(long)self.favid,arc4random()%1000];
+    dispatch_async(queue, ^{
+        
+        STRONG_SELF;
+        
+        [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+            NSString * code = json[@"code"];
+            if (code.integerValue == 2) {
+                [dic removeObjectForKey:[NSString stringWithFormat:@"%d",1]];
+                [self plistHuanCunWithDic:dic];
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.label.text = @"收藏删除成功!";
+                hud.label.textColor = COLOR(orangeColor);
+                [hud hideAnimated:YES afterDelay: 2];
+            }else if (code.integerValue == 101){
+                
+                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+                hud.mode = MBProgressHUDModeText;
+                hud.label.text = @"收藏不存在!";
+                hud.label.textColor = COLOR(orangeColor);
+                [hud hideAnimated:YES afterDelay: 2];
+                
+            }
+            
+        } failure:^(NSError *error) {
+            
+            
+        }];
+    });
+}
+//
+//- (void)praiseTheArticleToNet:(NSString *)str{
+//    
+//    WEAK_SELF;
+//    
+//    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+//    
+//    NSString * url = [NSString stringWithFormat:PraiseArticle,(long)self.aid,str,arc4random()%1000];
+//    
+//    NSLog(@"点赞地址%@",url);
+//    dispatch_async(queue, ^{
+//        
+//        STRONG_SELF;
+//        
+//        [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+//            
+//            NSString * str = json[@"code"];
+//            
+//            if (str.integerValue == 1) {
+//                
+//                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+//                hud.mode = MBProgressHUDModeText;
+//                hud.label.text = @"点赞成功!";
+//                hud.label.textColor = COLOR(orangeColor);
+//                [hud hideAnimated:YES afterDelay: 2];
+//            }else if (str.integerValue == 405){
+//                
+//                MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:strongSelf.view animated:YES];
+//                hud.mode = MBProgressHUDModeText;
+//                hud.label.text = @"您已点过赞!";
+//                hud.label.textColor = COLOR(orangeColor);
+//                [hud hideAnimated:YES afterDelay: 2];
+//                
+//                
+//            }
+//            
+//            
+//            
+//        } failure:^(NSError *error) {
+//            
+//            
+//        }];
+//    });
+//}
+
+#pragma mark -- MD5加密
+- (NSString *)stringToMD5:(NSString *)str{
+    const char *fooData = [str UTF8String];
+    
+    unsigned char result[CC_MD5_DIGEST_LENGTH];
+    
+    CC_MD5(fooData, (CC_LONG)strlen(fooData), result);
+    
+    NSMutableString *saveResult = [NSMutableString string];
+    
+    for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++) {
+        [saveResult appendFormat:@"%02x", result[i]];
+    }
+    return saveResult;
+}
+
+#pragma mark- plist缓存
+- (void) plistHuanCunWithDic:(NSDictionary *) dic {
+    
+    NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsPath = [path objectAtIndex:0];
+    NSString *plistPath = [documentsPath stringByAppendingPathComponent:isPraised];
+    [dic writeToFile:plistPath atomically:YES];
+}
+
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

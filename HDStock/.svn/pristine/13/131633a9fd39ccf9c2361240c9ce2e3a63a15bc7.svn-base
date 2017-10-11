@@ -1,0 +1,174 @@
+//
+//  BuiedProductDetailViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/13.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "BuiedProductDetailViewController.h"
+#import "BuiedPruductTableViewCell.h"//已购买列表页 头部
+#import "buiedProductDetailSecondCell.h"//股票趋势  中部
+#import "buiedProductDetailThirdCell.h"//底部
+#import "buiedProductDetailForthCellTableViewCell.h"
+#import "buiedProductDetailFifthCellTableViewCell.h"
+
+@interface BuiedProductDetailViewController ()<UITableViewDataSource,UITableViewDelegate>
+@property (nonatomic,strong) UITableView *tableView1;
+@end
+
+@implementation BuiedProductDetailViewController{
+    NSInteger twoButtonFlag;//个股下面菜单栏状态切换
+    NSInteger threeButtonFlag;//操盘动态 宏观分析  下面菜单栏切换
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    twoButtonFlag = 201;
+    threeButtonFlag = 201;
+    if(!self.tableView1){
+        self.tableView1 = [[UITableView alloc]init];
+    }
+    [self setNavCustemViewForLeftItemWithImage:imageNamed(@"Live_back") title:@"" titleFont:[UIFont systemFontOfSize:(15)] titleCoclor:[UIColor whiteColor] custemViewFrame:CGRM(0, 26, 56, 44)];
+    [self setNavDicWithTitleFont:17 titleColor:[UIColor whiteColor] title:@"项目服务"];
+    [self setTableView];
+}
+
+- (void)setTableView{
+    self.tableView1.delegate = self;
+    self.tableView1.dataSource = self;
+    self.tableView1.backgroundColor = RGBCOLOR(243, 243, 243);
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"BuiedPruductTableViewCell" bundle:nil] forCellReuseIdentifier:@"BuiedPruductTableViewCel"];
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"buiedProductDetailSecondCell" bundle:nil] forCellReuseIdentifier:@"buiedProductDetailSecondCell"];
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"buiedProductDetailThirdCell" bundle:nil] forCellReuseIdentifier:@"buiedProductDetailThirdCell"];
+     [self.tableView1 registerNib:[UINib nibWithNibName:@"buiedProductDetailForthCellTableViewCell" bundle:nil] forCellReuseIdentifier:@"buiedProductDetailForthCellTableViewCell"];
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"buiedProductDetailFifthCellTableViewCell" bundle:nil] forCellReuseIdentifier:@"buiedProductDetailFifthCellTableViewCell"];
+    self.tableView1.frame = CGRectMake(0, -10, SCREEN_WIDTH, SCREEN_HEIGHT-54);
+    self.tableView1.separatorStyle = UITableViewCellSelectionStyleNone;
+    [self.view addSubview:_tableView1];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    if(threeButtonFlag == 201){
+        if(section == 3){
+            return 5;
+        }else{
+            return 1;
+        }
+    }else{
+        return 1;
+    }
+}
+
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 4;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    switch (indexPath.section) {
+        case 0:
+        {
+            BuiedPruductTableViewCell *cell= [tableView dequeueReusableCellWithIdentifier:@"BuiedPruductTableViewCel"];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            return cell;
+        }
+            break;
+        case 1:
+        {
+            buiedProductDetailSecondCell *cell = [self.tableView1 dequeueReusableCellWithIdentifier:@"buiedProductDetailSecondCell"];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.twoButtonBlock = ^(NSInteger tagIndex){
+                NSLog(@"%ld",(long)tagIndex);
+                twoButtonFlag = tagIndex;
+                [self.tableView1 reloadData];
+            };
+            return cell;
+        }
+            break;
+        case 2:
+        {
+            buiedProductDetailThirdCell *cell=[self.tableView1 dequeueReusableCellWithIdentifier:@"buiedProductDetailThirdCell"];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.threeButtonBlock = ^(NSInteger senderIndex){
+                NSLog(@"%ld",(long)senderIndex);
+                threeButtonFlag = senderIndex;
+                [self.tableView1 reloadData];
+            };
+            
+            return cell;
+        }
+            break;
+        case 3:
+        {
+            if(threeButtonFlag == 201){
+                buiedProductDetailForthCellTableViewCell *cell=[self.tableView1 dequeueReusableCellWithIdentifier:@"buiedProductDetailForthCellTableViewCell"];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                return cell;
+            }else{
+                buiedProductDetailFifthCellTableViewCell *cell=[self.tableView1 dequeueReusableCellWithIdentifier:@"buiedProductDetailFifthCellTableViewCell"];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                return cell;
+            }
+        }
+            break;
+            
+        default:
+            break;
+    }
+    return nil;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    switch (indexPath.section) {
+        case 0:
+        {
+            NSString * tempStr = @"强势个股放量突破整理平台后星线回踩确认突破平台，且站稳年线，出现短线介入时机...";
+            NSMutableParagraphStyle *style1 = [[NSMutableParagraphStyle alloc] init];
+            style1.headIndent = 0;
+            style1.firstLineHeadIndent = 0;
+            style1.lineSpacing = 9;
+            CGSize secondDesc = [tempStr boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:style1} context:nil].size;
+            return 120+secondDesc.height-8;
+        }
+            break;
+        case 1:
+        {
+            return 210;
+        }
+            break;
+        case 2:
+        {
+            return 53;
+        }
+        case 3:
+        {
+            
+            if(threeButtonFlag==201){
+                NSString * tempStr = @"周五市场分化加剧，沪指在银行、石油、中字头等权重股拉抬下，展开反弹，午后涨幅收窄。创业板继续寻求支撑。";
+                NSMutableParagraphStyle *style1 = [[NSMutableParagraphStyle alloc] init];
+                style1.headIndent = 0;
+                style1.firstLineHeadIndent = 0;
+                style1.lineSpacing = 7;
+                CGSize secondDesc = [tempStr boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:style1} context:nil].size;
+                return 74+secondDesc.height-25;
+            }else{
+                NSString * tempStr = @"周五市场分化加剧，沪指在银行、石油、中字头等权重股拉抬下，展开反弹，午后涨幅收窄。创业板继续寻求支撑。";
+                NSMutableParagraphStyle *style1 = [[NSMutableParagraphStyle alloc] init];
+                style1.headIndent = 0;
+                style1.firstLineHeadIndent = 0;
+                style1.lineSpacing = 7;
+                CGSize secondDesc = [tempStr boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:style1} context:nil].size;
+                return 40+secondDesc.height-15;
+            
+            }
+        }
+        
+            break;
+        default:
+            break;
+    }
+    return 28;
+}
+
+@end

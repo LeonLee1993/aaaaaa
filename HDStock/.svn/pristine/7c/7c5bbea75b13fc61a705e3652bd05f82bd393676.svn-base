@@ -1,0 +1,15 @@
+//
+//  HDPersonalInformationCell.h
+//  HDStock
+//
+//  Created by liyancheng on 16/11/29.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+//我的收藏资讯页面cell
+
+@interface HDPCCollectedInformationCell : UITableViewCell
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+@property (nonatomic,assign) NSInteger flag;
+@end

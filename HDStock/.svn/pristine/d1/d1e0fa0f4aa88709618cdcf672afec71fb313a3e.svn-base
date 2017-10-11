@@ -1,0 +1,35 @@
+//
+//  MyOrderTableViewCell.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/12.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "MyOrderTableViewCell.h"
+
+@implementation MyOrderTableViewCell
+
+-(void)setModel:(MyOrderList *)model{
+    _model = model;
+    _time.text = model.created_at;
+    _price.text = model.price;
+    
+    if([model.status isEqual:@(0)]){
+        _state.text = @"服务中";
+        _byButton.userInteractionEnabled = NO;
+        [_byButton setTintColor:[UIColor grayColor]];
+        _byButton.layer.borderColor = [UIColor grayColor].CGColor;
+    }else if ([model.status isEqual:@(1)]){
+        _state.text = @"服务到期";
+        _byStateImage.image = [UIImage imageNamed:@"wodedingdan_failed"];
+    }else if([model.status isEqual:@(2)]){
+        _state.text = @"未付款";
+        _byStateImage.image = [UIImage imageNamed:@"wodedingdan_failed"];
+    }
+}
+- (IBAction)buyButtonClicked:(UIButton *)sender {
+    self.block(_model.price,_model.product_id.stringValue);
+}
+
+@end

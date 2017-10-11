@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1108" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" restorationIdentifier="MyAskSecondTableViewCell" selectionStyle="default" indentationWidth="10" rowHeight="127" id="KGk-i7-Jjw" customClass="MyAskSecondTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="127"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="127"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@王Q" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a5f-do-Xkk">
+                        <rect key="frame" x="10" y="97.5" width="35.5" height="16"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="11-23 17:58" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gyd-YJ-3D4">
+                        <rect key="frame" x="51.5" y="98.5" width="61.5" height="14"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                        <color key="textColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Yb-IR-vMZ">
+                        <rect key="frame" x="10" y="6" width="300" height="81.5"/>
+                        <attributedString key="attributedText">
+                            <fragment content="老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！">
+                                <attributes>
+                                    <color key="NSColor" red="0.20000000000000001" green="0.19920450227963524" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <font key="NSFont" size="15" name=".PingFangSC-Regular"/>
+                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineSpacing="4" tighteningFactorForTruncation="0.0"/>
+                                </attributes>
+                            </fragment>
+                        </attributedString>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="2Yb-IR-vMZ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="-2" id="7m9-gC-krF"/>
+                    <constraint firstAttribute="bottom" secondItem="a5f-do-Xkk" secondAttribute="bottom" constant="13" id="AJI-aF-64C"/>
+                    <constraint firstItem="a5f-do-Xkk" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="HQb-5b-7As"/>
+                    <constraint firstAttribute="bottom" secondItem="Gyd-YJ-3D4" secondAttribute="bottom" constant="14" id="LmH-Zj-WDq"/>
+                    <constraint firstAttribute="leadingMargin" secondItem="2Yb-IR-vMZ" secondAttribute="leading" constant="-2" id="VJw-cm-3Me"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="2Yb-IR-vMZ" secondAttribute="trailing" constant="2" id="eGK-ps-FHF"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="2Yb-IR-vMZ" secondAttribute="bottom" constant="31" id="fkI-ig-fRt"/>
+                    <constraint firstItem="Gyd-YJ-3D4" firstAttribute="leading" secondItem="a5f-do-Xkk" secondAttribute="trailing" constant="6" id="rCI-FR-bbz"/>
+                </constraints>
+            </tableViewCellContentView>
+            <point key="canvasLocation" x="42" y="95.5"/>
+        </tableViewCell>
+    </objects>
+</document>

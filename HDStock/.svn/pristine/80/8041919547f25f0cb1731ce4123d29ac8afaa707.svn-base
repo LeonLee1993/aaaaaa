@@ -1,0 +1,63 @@
+//
+//  HDLiveLivingViewController.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/11/14.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDLiveLivingViewController.h"
+#import <WebKit/WebKit.h>
+//#import "MBProgressHUD+NH.h"
+
+@interface HDLiveLivingViewController()<WKNavigationDelegate>{
+    WKWebView * wkWeb;
+}
+
+@end
+
+@implementation HDLiveLivingViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    self.view.backgroundColor = COLOR(purpleColor);
+    [self createWkWeb];
+
+}
+
+- (void) createWkWeb {
+    wkWeb = [[WKWebView alloc] initWithFrame:CGRM(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-NAV_STATUS_HEIGHT-173)];
+
+    wkWeb.navigationDelegate = self;
+    [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.baidu.com"]]];
+    wkWeb.scrollView.showsVerticalScrollIndicator = NO;
+    wkWeb.backgroundColor = BACKGROUNDCOKOR;
+    [self.view addSubview:wkWeb];
+
+}
+
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    [MBProgressHUD showLoadToView:self.view];
+}
+- (void) webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+}
+
+#pragma mark - foo
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

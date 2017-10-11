@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2657" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="HDScrollWordsTableViewCell" rowHeight="46" id="KGk-i7-Jjw" customClass="HDScrollWordsTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="46"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="46"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="rediantouzi" translatesAutoresizingMaskIntoConstraints="NO" id="BeD-qp-Hk7">
+                        <rect key="frame" x="0.0" y="0.0" width="60" height="45"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="60" id="Dmr-Ra-Ab9"/>
+                        </constraints>
+                    </imageView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UW1-z8-TjK">
+                        <rect key="frame" x="60" y="0.0" width="3" height="46"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="3" id="ne0-bq-jmS"/>
+                        </constraints>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fro-eg-bif" customClass="SDCycleScrollView">
+                        <rect key="frame" x="63" y="0.0" width="291" height="45"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="fro-eg-bif" secondAttribute="bottom" id="16R-dC-EBj"/>
+                    <constraint firstItem="UW1-z8-TjK" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="83o-EJ-Cau"/>
+                    <constraint firstAttribute="bottom" secondItem="BeD-qp-Hk7" secondAttribute="bottom" id="9ap-tk-gg7"/>
+                    <constraint firstAttribute="bottom" secondItem="UW1-z8-TjK" secondAttribute="bottom" id="Bhq-cU-PKs"/>
+                    <constraint firstItem="fro-eg-bif" firstAttribute="leading" secondItem="UW1-z8-TjK" secondAttribute="trailing" id="Ucb-RC-g3P"/>
+                    <constraint firstItem="BeD-qp-Hk7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="Wf6-ek-uSn"/>
+                    <constraint firstItem="UW1-z8-TjK" firstAttribute="leading" secondItem="BeD-qp-Hk7" secondAttribute="trailing" id="fm3-v0-hKG"/>
+                    <constraint firstItem="BeD-qp-Hk7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="il8-U7-bGn"/>
+                    <constraint firstAttribute="trailing" secondItem="fro-eg-bif" secondAttribute="trailing" constant="21" id="jSg-EJ-2nL"/>
+                    <constraint firstItem="fro-eg-bif" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="q45-r8-ngx"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="wordsScorllView" destination="fro-eg-bif" id="OmN-sT-upK"/>
+            </connections>
+            <point key="canvasLocation" x="-20.5" y="-37"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="rediantouzi" width="32" height="32"/>
+    </resources>
+</document>

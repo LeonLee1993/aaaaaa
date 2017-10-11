@@ -1,0 +1,172 @@
+//
+//  PSYPopOutView.m
+//  HDStock
+//
+//  Created by hd-app02 on 2016/12/16.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "PSYPopOutView.h"
+
+@interface PSYPopOutView()
+
+@property (nonatomic, strong) MBProgressHUD * hud;
+
+@property (nonatomic, strong) UIView * mainView;
+
+@property (nonatomic, strong) UILabel * titleLabel;
+
+@property (nonatomic, strong) UIView * lineTop;
+
+@property (nonatomic, strong) UIButton * sureButton;
+
+@property (nonatomic, strong) UIView * lineBottom;
+
+@property (nonatomic, strong) UITextView * textView;
+
+@property (nonatomic, strong) NSArray * dataArray;
+
+@property (nonatomic, assign) CGFloat textHeight;
+
+@end
+
+@implementation PSYPopOutView
+
+- (instancetype)initWithFrame:(CGRect)frame{
+    
+    if (self = [super initWithFrame:frame]) {
+        
+        self.mainView = [[UIView alloc]initWithFrame:CGRectZero];
+        self.titleLabel = [[UILabel alloc]initWithFrame:CGRectZero];
+        self.sureButton = [[UIButton alloc]initWithFrame:CGRectZero];
+        self.textView = [[UITextView alloc]initWithFrame:CGRectZero];
+        self.lineTop = [[UIView alloc]initWithFrame:CGRectZero];
+        self.lineBottom = [[UIView alloc]initWithFrame:CGRectZero];
+        [self addSubview:self.mainView];
+        [self.mainView addSubview:self.titleLabel];
+        [self.mainView addSubview:self.lineTop];
+        [self.mainView addSubview:self.textView];
+        [self.mainView addSubview:self.lineBottom];
+        [self.mainView addSubview:self.sureButton];
+        
+        self.hud = [[MBProgressHUD alloc]init];
+        
+        [self addPopAnimation];
+        [self setUpSubViews];
+    }
+    
+    return self;
+    
+}
+
+- (void)setUpSubViews{
+    
+    //UIImage  *image=[UIImage sd_animatedGIFNamed:@"RefreshLOGO"];
+//    UIImageView  *gifview=[[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 37, 37)];
+//    PSYHUDAnimation * gifview = [[PSYHUDAnimation alloc]initWithFrame:CGRectMake(0, 0, 37, 37)];
+    self.hud.margin = 0.0f;
+    self.hud.mode = MBProgressHUDModeCustomView;
+//    self.hud.customView=gifview;
+    
+    self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3f];
+    self.mainView.backgroundColor = [UIColor whiteColor];
+    
+    self.titleLabel.font = [UIFont systemFontOfSize:15];
+    self.titleLabel.textColor = [UIColor blackColor];
+    self.titleLabel.textAlignment = NSTextAlignmentCenter;
+    
+    self.lineTop.backgroundColor = [UIColor colorWithRed:238.0f/256.0f green:238.0f/256.0f blue:238.0f/256.0f alpha:1.0f];
+    
+    self.textView.backgroundColor = [UIColor colorWithRed:243.0f/256.0f green:243.0f/256.0f blue:243.0f/256.0f alpha:1.0f];
+    self.textView.showsVerticalScrollIndicator = NO;
+    self.textView.editable = NO;
+    self.textView.font = [UIFont systemFontOfSize:13];
+    self.textView.textColor = [UIColor darkTextColor];
+    
+    self.lineBottom.backgroundColor = [UIColor colorWithRed:238.0f/256.0f green:238.0f/256.0f blue:238.0f/256.0f alpha:1.0f];
+    
+    [self.sureButton setTitle:@"已阅" forState:UIControlStateNormal];
+    self.sureButton.titleLabel.font = [UIFont systemFontOfSize:15];
+    [self.sureButton setTitleColor:MAIN_COLOR forState:UIControlStateNormal];
+    [self.sureButton addTarget:self action:@selector(sureButtonOnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+}
+
+- (void)sureButtonOnClicked:(UIButton *)button{
+    
+    [self removeFromSuperview];
+    
+}
+
+- (void)layoutSubviews{
+    
+    [super layoutSubviews];
+    [self requestData];
+    self.mainView.frame = CGRectMake(10, 140, SCREEN_WIDTH-20, 340);
+    self.titleLabel.frame = CGRectMake(0, 0, self.mainView.bounds.size.width, 40);
+    self.lineTop.frame = CGRectMake(0, CGRectGetMaxY(self.titleLabel.frame) - 1, self.mainView.bounds.size.width, 0.5);
+    self.textView.frame = CGRectMake(0, 40, self.mainView.bounds.size.width, 260);
+    self.lineBottom.frame = CGRectMake(0, 299, self.mainView.bounds.size.width, 1);
+    self.sureButton.frame = CGRectMake(0, 300, self.mainView.bounds.size.width, 40);
+    
+}
+
+#pragma mark - 网络请求
+- (void)requestData{
+
+    [self.mainView addSubview:self.hud];
+    [self.hud showAnimated:YES];
+    NSString * url = [NSString stringWithFormat:Home_HeadLineCateNews,1,1,14,@"0",arc4random()%10000];
+    
+    WEAK_SELF;
+    //1.获取一个全局串行队列
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    
+    dispatch_async(queue, ^{
+        
+        STRONG_SELF;
+        
+        [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+            
+            [self.hud hideAnimated:YES];
+            NSArray * dataArr = json[@"data"];
+            
+            
+            for (NSDictionary * dic in dataArr) {
+                
+                self.titleLabel.text = dic[@"title"];
+                
+                self.textView.text = dic[@"summary"];
+                
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                [strongSelf layoutIfNeeded];
+                
+            });
+            
+        } failure:^(NSError *error) {
+            
+            [self.hud removeFromSuperViewOnHide];
+            
+            
+        }];
+        
+    });
+    
+    
+    
+}
+
+- (void)addPopAnimation {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    animation.fromValue = [NSNumber numberWithDouble:0.f];
+    animation.toValue   = [NSNumber numberWithDouble:1.f];
+    animation.duration  = .25f;
+    animation.fillMode  = kCAFillModeBackwards;
+    [self.layer addAnimation:animation forKey:nil];
+}
+
+@end

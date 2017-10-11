@@ -1,0 +1,44 @@
+//
+//  PSYRefreshGifHeader.m
+//  HDStock
+//
+//  Created by hd-app02 on 2016/12/15.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "PSYRefreshGifHeader.h"
+
+@implementation PSYRefreshGifHeader
+
+- (void)prepare{
+
+    [super prepare];
+    
+    CGSize size = CGSizeMake(37, 37);
+    
+    UIImage * image1 = [imageNamed(@"logo_tiaogao_1")scaleToSize:size];
+    UIImage * image2 = [imageNamed(@"logo_tiaogao_2")scaleToSize:size];
+    UIImage * image3 = [imageNamed(@"logo_tiaogao_3")scaleToSize:size];
+    UIImage * image4 = [imageNamed(@"logo_tiaogao_4")scaleToSize:size];
+    UIImage * image5 = [imageNamed(@"logo_tiaogao_5")scaleToSize:size];
+    UIImage * image6 = [imageNamed(@"logo_tiaogao_6")scaleToSize:size];
+    UIImage * image7 = [imageNamed(@"logo_tiaogao_7")scaleToSize:size];
+    UIImage * image8 = [imageNamed(@"logo_tiaogao_8")scaleToSize:size];
+    
+    NSArray * idleImages = @[image1,image2,image3,image4,image5,image6,image7,image8];
+    
+    [self setImages:idleImages forState:MJRefreshStateIdle];
+    [self setImages:idleImages forState:MJRefreshStateRefreshing];
+    [self setImages:idleImages forState:MJRefreshStatePulling];
+
+    [self setImages:idleImages duration:0.8f forState:MJRefreshStateIdle];
+    [self setImages:idleImages duration:0.8f forState:MJRefreshStateRefreshing];
+    [self setImages:idleImages duration:0.8f forState:MJRefreshStatePulling];
+    
+    self.lastUpdatedTimeLabel.hidden = YES;
+    //self.stateLabel.hidden = YES;
+    self.stateLabel.textColor = COLOR(darkTextColor);
+    self.stateLabel.font = [UIFont systemFontOfSize:12];
+}
+
+@end

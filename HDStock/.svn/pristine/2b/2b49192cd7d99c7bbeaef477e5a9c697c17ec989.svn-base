@@ -1,0 +1,19 @@
+//
+//  MyOrderTableViewCell.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/12.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "MyOrderTableViewCell.h"
+
+@implementation MyOrderTableViewCell
+
+-(void)setModel:(MyOrderList *)model{
+    _model = model;
+    _time.text = model.created_at;
+    _price.text = model.price;
+}
+
+@end

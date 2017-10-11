@@ -1,0 +1,62 @@
+//
+//  HDStockNavigationController.m
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDStockNavigationController.h"
+#import "HDVideoDetailsViewController.h"
+@interface HDStockNavigationController ()
+
+@end
+
+@implementation HDStockNavigationController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+}
+
+- (void)viewWillLayoutSubviews{
+
+    [super viewWillLayoutSubviews];
+    
+//    NSLog(@"%@",NSStringFromCGRect(self.navigationBar.frame));
+
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (UIViewController *)childViewControllerForStatusBarHidden{
+
+    NSArray * arr = self.viewControllers;
+    
+    for (UIViewController * vc in arr) {
+        
+        if ([vc isKindOfClass:[HDVideoDetailsViewController class]]) {
+            
+            return vc;
+        }
+        
+    }
+    
+    return nil;
+
+}
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

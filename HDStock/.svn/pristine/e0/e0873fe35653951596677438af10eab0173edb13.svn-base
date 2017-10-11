@@ -1,0 +1,23 @@
+//
+//  HDHomePageViewController.h
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/9.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDStockBaseViewController.h"
+#import "HDTopScrollCell.h"
+#import "HDMiddleCell.h"
+#import "HDSingleView.h"
+
+#import "YJSegmentedControl.h"
+
+
+#define HDTopCellHeight 350
+#define HDMiddleCellHeight 240
+#define HDBottomCellHeight 100
+
+@interface HDHomePageViewController : HDStockBaseViewController<YJSegmentedControlDelegate>
+
+@end

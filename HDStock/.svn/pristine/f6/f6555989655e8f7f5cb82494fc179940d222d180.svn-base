@@ -1,0 +1,1333 @@
+//
+//  HDNewLiveViewController.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/12/13.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDNewLiveViewController.h"
+#import "HDShareCustom.h"
+
+
+@interface HDNewLiveViewController ()<touchBeginDelegate,thyShareCustomDlegate>{
+    
+    AppDelegate * _appDelegate;//用于控制本页面旋转
+    UIImageView * navFloorMenuBgIMV;//菜单浮层IMV
+    NSArray * vcArr;//装子控制器
+    UIViewController * _currentVC;//当前显示的控制器
+    
+    //直播
+    NSURL*  mSourceURL;//直播网址
+    BOOL replay;
+    BOOL bSeeking;
+    BOOL mPaused;
+    CGFloat moviePlayerViewHeightRate;//播放器高度=屏幕宽度*9.0/16
+    BOOL isReconnectToVedioUrlBool;//是否重连直播地址：默认不重连
+    
+    UIButton * rotateBtn;//旋转按钮
+    UIButton * closeVoiceBtn;//静音按钮
+    CGFloat rotateBtnWidth;//旋转按钮宽度
+    
+    BOOL isFirstComeInThyVCBool;//第一次进入这个页面
+    BOOL isReconnectWifi;//重连WiFi、手机网络
+    BOOL isPhoneDataUrl;//手机自带网络
+    
+
+}
+@property (nonatomic,strong) HDLiveModel * voiceModel;//KVO控制声音
+@property (nonatomic,strong) UIButton * playerUrlErrorBtn;//没有直播资源时的占位按钮
+
+@property (nonatomic, strong) AliVcMediaPlayer* mPlayer;
+@property (nonatomic, strong) UIView *mPlayerView;
+@property (nonatomic, strong) Reachability *conn;
+@property (nonatomic,assign)CGPoint originalLocation;
+
+@property (nonatomic,strong) HDShareCustom * customShare;
+
+@end
+
+@implementation HDNewLiveViewController
+
+@synthesize mPlayer;
+@synthesize mPlayerView;
+@synthesize conn;
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [self removeNavFloorMenuIMV];
+}
+- (void) dealloc {
+    [self.conn stopNotifier];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+- (void)firstCheckNetworkState
+{
+    
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    [[AFNetworkReachabilityManager sharedManager ] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+
+    if (status == AFNetworkReachabilityStatusReachableViaWiFi) {
+        //wifi
+        NSLog(@"firstCheckNetworkState-有wifi");
+        isReconnectWifi = NO;
+        isPhoneDataUrl = NO;
+        
+        if (!isFirstComeInThyVCBool) {
+            if (_appDelegate.isHaveLivePlayed) {
+                [mPlayer play];//继续播放
+                [self showRotateVoiceBtn];
+            }else {
+                [self reconnectToVedioUrl];
+            }
+        }
+    }else if (status == AFNetworkReachabilityStatusReachableViaWWAN){
+        //手机自带网络
+        NSLog(@"firstCheckNetworkState-有手机自带网络");
+
+        isPhoneDataUrl = YES;//手机自带网络
+        if (mPlayer) {
+            [mPlayer pause];//暂停
+        }
+        if (self.tabBarController.selectedIndex == 3) {
+            if (IOS8) {
+                //执行操作
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"你当前使用的是手机自带网络" preferredStyle:UIAlertControllerStyleAlert];
+                
+                WEAK_SELF;
+                UIAlertAction *actionQuik = [UIAlertAction actionWithTitle:@"退出观看" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                    STRONG_SELF;
+                    [strongSelf performSelector:@selector(alertQuickSeeLive)];
+                }];
+                
+                UIAlertAction *actionContinue = [UIAlertAction actionWithTitle:@"继续观看" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                    STRONG_SELF;
+                    [strongSelf performSelector:@selector(alertContinueSeeLive)];
+                }];
+                
+                [alertController addAction:actionQuik];
+                [alertController addAction:actionContinue];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }else {
+                UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:@"你当前使用的是手机自带网络" delegate:self cancelButtonTitle:@"继续观看" otherButtonTitles:@"退出观看", nil];
+                [alter show];
+            }
+        }
+    }else {
+        NSLog(@"firstCheckNetworkState-没有网");
+        NSLog(@"firstCheckNetworkState-没有网络");
+        isPhoneDataUrl = NO;
+        isReconnectWifi = YES;
+        [MBProgressHUD hideHUDForView:mPlayerView];
+        if (mPlayer) {
+            [mPlayer pause];
+        }
+        
+        if (self.tabBarController.selectedIndex == 3) {
+            [[vcArr[0] wkWeb].scrollView.mj_header endRefreshing];
+            if (IOS8) {
+                //执行操作
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"你的网络已断开" preferredStyle:UIAlertControllerStyleAlert];
+                WEAK_SELF;
+                UIAlertAction *actionCancel = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                    STRONG_SELF;
+                    [strongSelf performSelector:@selector(alertLoadUrlFailedCanRetry)];
+                    
+                }];
+                [alertController addAction:actionCancel];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }else {
+                UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"" message:@"你的网络已断开" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [alter show];
+            }
+        }
+    }
+    }];
+}
+
+#pragma mark - viewDidLoad
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    isFirstComeInThyVCBool = YES;
+    [self setUp];//初始化
+    [self setNormalBackNav];//返回按钮
+    [self setNavBarRightItemWithImage:imageNamed(@"Live_Menu")];//菜单按钮
+    [self createBlcakFloorMenuView];//创建黑色菜单浮层IMV
+    [self prepareForLive];//直播准备工作
+    [self setUpLive];//直播初始化
+    [self createChildVCs];//创建子控制器
+    
+}
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.tabBarController.tabBar.hidden = YES;//隐藏tabbar
+    //防止因tabbar隐藏了而漏出底层的window
+    self.view.frame = CGRM(0, 64, SCREEN_SIZE_WIDTH, SCREEN_SIZE_HEIGHT);
+    _appDelegate.allowRotation = 1;//只有该界面可以旋转
+    [self registOrCancellVoiceAndRotateNotificationWillAppearBool:YES];//注册旋转屏幕通知
+    [self firstCheckNetworkState];//检查网络
+    
+    if (!isFirstComeInThyVCBool) {//不是第一次进入这个界面时，需要重新添加通知
+        [self addPlayerObserver];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    isFirstComeInThyVCBool = NO;
+    [mPlayer pause];//暂停播放
+    self.tabBarController.tabBar.hidden = NO;//显示导航栏
+    navFloorMenuBgIMV.alpha = 0;//移除菜单浮层
+    _appDelegate.allowRotation = 0;//退出后的页面不能旋转
+    [navFloorMenuBgIMV removeFromSuperview];
+    [self registOrCancellVoiceAndRotateNotificationWillAppearBool:NO];
+    [self.view endEditing:YES];
+    [[vcArr[0] wkWeb].scrollView.mj_header endRefreshing];
+    //移除通知
+    [self.conn stopNotifier];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+}
+
+#pragma mark - 懒加载
+
+- (UIButton *)playerUrlErrorBtn {
+    if (!_playerUrlErrorBtn) {
+        _playerUrlErrorBtn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+        [_playerUrlErrorBtn setBackgroundImage:imageNamed(@"Live_teacherGone") forState:(UIControlStateNormal)];
+        [_playerUrlErrorBtn addTarget:self action:@selector(playerUrlErrorBtnClicked:) forControlEvents:(UIControlEventTouchUpInside)];
+        _playerUrlErrorBtn.frame = CGRM(0, 0, mPlayerView.width, mPlayerView.height);
+        _playerUrlErrorBtn.hidden = YES;
+    }
+    return _playerUrlErrorBtn;
+}
+- (HDLiveModel *)voiceModel {
+    if (!_voiceModel) {
+        _voiceModel = [HDLiveModel new];
+    }
+    return _voiceModel;
+}
+
+#pragma mark - KVO
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    NSLog(@"keyPath=%@,object=%@,change=%@,context=%@",keyPath,object,change,context);
+    if (self.voiceModel.needCloseVoiceBool) {//静音
+        mPlayer.muteMode = YES;
+        _appDelegate.isCloseVoiceBool = YES;
+        rotateBtn.selected = NO;
+        NSLog(@"静音");
+    }else {//扩音
+        mPlayer.muteMode = NO;
+        _appDelegate.isCloseVoiceBool = NO;
+        rotateBtn.selected = YES;
+        NSLog(@"扩音");
+    }
+}
+#pragma mark - PROTOCOL_METHOD
+- (void)webViewTouchbegin {
+    [self removeNavFloorMenuIMV];
+}
+- (void) shareBlcakBgViewTaped {
+    [mPlayer play];
+}
+- (void)shareCustomShareBtnClicked {
+//    [mPlayer play];
+}
+
+#pragma mark - 设置
+- (void) setUp {
+    
+    self.view.backgroundColor = UICOLOR(239, 238, 244, 1);
+    //本控制器支持旋转
+    _appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    _appDelegate.allowRotation = 1;
+    
+    moviePlayerViewHeightRate = 9.0/16;//播放器高度=屏幕宽度*这个比例
+    HDLiveLivingViewController * webVC = [HDLiveLivingViewController new];
+    vcArr = @[webVC];
+    webVC.touchDelegate = self;//监听网页的点击事件
+    (SCREEN_HEIGHT<=HEIGHT_5s)?(rotateBtnWidth = 31):(rotateBtnWidth = 31*WIDTH);//旋转按钮宽度
+
+    //分享
+    _customShare = [HDShareCustom new];
+    _customShare.comFromIndex = 0;
+    _customShare.shareCustomDlegate = self;
+    WEAK_SELF;
+    //判断是否安装了接受分享的设备
+    _customShare.isInstalledAlertBlock = ^(NSString * isInstalledStr){
+        STRONG_SELF;
+        [strongSelf jugeWithStr:isInstalledStr];
+    };
+    //开始分享
+    _customShare.sharePlatBlock = ^(NSInteger platType){
+        STRONG_SELF;
+        NSString * str = @"http://gk.cdtzb.com/wap/index";
+
+        NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
+        if (platType == 2){//微博
+            [shareParams SSDKSetupSinaWeiboShareParamsByText:[NSString stringWithFormat:@"年末行情如何把握，尽在股哥直播:%@",[NSURL URLWithString:str] ]
+                                                       title:@"股哥直播室"
+                                                       image:[UIImage imageNamed:@"shareIcon"]
+                                                         url:[NSURL URLWithString:str]
+                                                    latitude:0
+                                                   longitude:0
+                                                    objectID:nil
+                                                        type:(SSDKContentTypeAuto)];
+            [shareParams SSDKEnableUseClientShare];
+            [strongSelf.customShare gotoShareWithContent:shareParams];
+        }else if (platType == 0 || platType == 1 || platType == 3) {//微信好友，微信朋友圈，QQ
+            //1、创建分享参数
+            NSArray* imageArray = @[[UIImage imageNamed:@"shareIcon"]];
+            if (imageArray) {
+                NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
+                [shareParams SSDKSetupShareParamsByText:@"年末行情如何把握，尽在股哥直播"
+                                                 images:imageArray
+                                                    url:[NSURL URLWithString:str]
+                                                  title:@"股哥直播室"
+                                                   type:SSDKContentTypeAuto];
+                [strongSelf.customShare gotoShareWithContent:shareParams];
+            }
+        }
+    };
+    
+    //分享状态
+    self.customShare.shareStatusBlock = ^(NSInteger shareState){
+        STRONG_SELF;
+        [strongSelf.mPlayer play];
+        switch (shareState) {
+            case SSDKResponseStateSuccess:
+            {
+                [MBProgressHUD showMessage:@"分享成功" ToView:strongSelf.mPlayerView RemainTime:2];
+            }
+                break;
+            case SSDKResponseStateFail:
+            {
+                [MBProgressHUD showMessage:@"分享失败" ToView:strongSelf.mPlayerView RemainTime:2];
+            }
+                break;
+            case SSDKResponseStateCancel:
+            {
+                [MBProgressHUD showMessage:@"取消分享" ToView:strongSelf.mPlayerView RemainTime:2];
+            }
+                break;
+            default:
+                break;
+        }
+    };
+}
+
+#pragma mark - 创建UI
+//创建导航条上菜单浮层
+- (void) createBlcakFloorMenuView {
+    //黑色背景
+    navFloorMenuBgIMV = [[UIImageView alloc] initWithFrame:CGRM(SCREEN_SIZE_WIDTH-10-106, NAV_STATUS_HEIGHT-10, 106, (118-2)*2/3.0)];
+    navFloorMenuBgIMV.image = imageNamed(@"Live_blackMenu");
+    navFloorMenuBgIMV.userInteractionEnabled = YES;
+    navFloorMenuBgIMV.alpha = 0;
+    
+    NSArray * menuArr = @[@"查看历史",@"分享直播"];
+    NSArray * menuImageArr = @[imageNamed(@"Live_history"),imageNamed(@"Live_shareLive")];
+    CGFloat navFloorMenuBgIMVHeight = navFloorMenuBgIMV.height-7;
+    CGFloat sectionHeight = (navFloorMenuBgIMVHeight-1)/menuArr.count;
+    for (int i = 0; i < menuArr.count; i++) {
+        //左边的图标
+        UIImageView * iconIMV = [[UIImageView alloc] initWithFrame:CGRM(14, 7+(sectionHeight+1)*i+sectionHeight/2-6.5, 15, 13)];
+        iconIMV.image = menuImageArr[i];
+        [navFloorMenuBgIMV addSubview:iconIMV];
+        
+        //右边的字
+        UILabel * tempLab = [ZHFactory createLabelWithFrame:CGRM(CGMAX_X(iconIMV.frame)+12, CGMID_Y(iconIMV.frame)-iconIMV.height/2, 54, iconIMV.height) andFont:[UIFont systemFontOfSize:13] andTitleColor:[UIColor whiteColor] title:menuArr[i]];
+        tempLab.tag = 2000+i;
+        [navFloorMenuBgIMV addSubview:tempLab];
+        
+        //分割线
+        if (i < menuArr.count-1) {
+            UIView * lineView = [[UIView alloc] initWithFrame:CGRM(CGMIN_X(iconIMV.frame), 8+sectionHeight*(i+1), navFloorMenuBgIMV.width-CGMIN_X(iconIMV.frame)*2, 1)];
+            lineView.backgroundColor = [UIColor colorWithHexString:@"#2c2c2c"];
+            [navFloorMenuBgIMV addSubview:lineView];
+        }
+        
+        //按钮
+        UIButton * tempMenuBtn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+        tempMenuBtn.frame = CGRM(0, 7+(sectionHeight+1)*i, navFloorMenuBgIMV.width, sectionHeight);
+        [tempMenuBtn addTarget:self action:@selector(tempMenuBtnClicked:) forControlEvents:(UIControlEventTouchUpInside)];
+        tempMenuBtn.tag = 600+i;
+        
+        [navFloorMenuBgIMV addSubview:tempMenuBtn];
+    }
+}
+
+- (void) createChildVCs {
+    for (int i = 0; i < vcArr.count; i++) {
+        [self addChildViewController:vcArr[i]];
+        [[vcArr[i] view] setTag:600+i];
+        [self addChildViewController:vcArr[i]];
+    }
+    
+    _currentVC = vcArr[0];
+    [self transitionFromOldViewController:_currentVC toNewViewController:vcArr[0]];
+    [self fitFrameForChildViewController:vcArr[0]];
+}
+
+#pragma mark - 创建视屏播放控件
+- (void) setupControls
+{
+    //视频显示区域
+    mPlayerView = [[UIView alloc] init];
+    mPlayerView.backgroundColor = [UIColor redColor];
+    [self.view addSubview:mPlayerView];
+    //给视频播放视图添加tap手势
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(mPlayerViewTaped)];
+    [mPlayerView addGestureRecognizer:tap];
+    
+    //旋转按钮
+    rotateBtn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+    rotateBtn.backgroundColor = UICOLOR(29, 29, 29, 0.25);
+    rotateBtn.layer.cornerRadius = rotateBtnWidth/2;
+    rotateBtn.layer.masksToBounds = YES;
+    [rotateBtn setImage:imageNamed(@"Live_rotateToFullScreen") forState:(UIControlStateNormal)];
+    [rotateBtn addTarget:self action:@selector(rotateBtnClicked:) forControlEvents:(UIControlEventTouchUpInside)];
+    [self.view addSubview:rotateBtn];
+
+    //静音按钮
+    closeVoiceBtn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+    closeVoiceBtn.backgroundColor = UICOLOR(29, 29, 29, 0.25);
+    closeVoiceBtn.layer.cornerRadius = rotateBtnWidth/2;
+    closeVoiceBtn.layer.masksToBounds = YES;
+    [closeVoiceBtn setImage:imageNamed(@"Live_volume") forState:(UIControlStateNormal)];
+    [closeVoiceBtn setImage:imageNamed(@"Live_volume_close") forState:(UIControlStateSelected)];
+    [self.view addSubview:closeVoiceBtn];
+    [closeVoiceBtn addTarget:self action:@selector(closeVoiceBtnClicked:) forControlEvents:(UIControlEventTouchUpInside)];
+    
+    [self adjustLayoutsubViews];
+    
+    [self hidRotateVoiceBtn];
+}
+#pragma mark - 设置坐标
+- (void) setUpNormalAllSubViews {
+    if (mPlayerView) {//防止界面坐标向下移动一个导航栏的高度
+        [self adjustLayoutsubViews];
+        [self adjustSelectionViewAndChildVCViewsFrame];
+    }
+}
+
+- (void) adjustSelectionViewAndChildVCViewsFrame {
+    for (int i = 0; i < vcArr.count; i++) {
+        [self fitFrameForChildViewController:vcArr[i]];
+    }
+}
+- (void)fitFrameForChildViewController:(UIViewController *)chileViewController{
+    
+    //设置子控制器的frame高度
+    CGRect subViewFrame = chileViewController.view.frame;
+    subViewFrame.origin.y = CGRectGetMaxY(mPlayerView.frame);//设置子控制器view的y坐标
+    subViewFrame.size.height = SCREEN_HEIGHT-NAV_STATUS_HEIGHT-SCREEN_SIZE_WIDTH*9.0/16-50+TABBAR_HEIGHT;
+    chileViewController.view.frame = subViewFrame;
+    
+    //设置子控制器中UI控件的frame高度
+    CGRect childSubViewFrame;
+    
+    if ([chileViewController isEqual:vcArr[0]]) {//直播
+        
+        childSubViewFrame = [[vcArr[0] wkWeb] frame];
+        childSubViewFrame.size.height = chileViewController.view.frame.size.height;
+        [vcArr[0] wkWeb].frame = childSubViewFrame;
+    }
+}
+//转换子视图控制器
+- (void)transitionFromOldViewController:(UIViewController *)oldViewController toNewViewController:(UIViewController *)newViewController{
+    [self transitionFromViewController:oldViewController toViewController:newViewController duration:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:nil completion:^(BOOL finished) {
+        if (finished) {
+            [newViewController didMoveToParentViewController:self];
+            _currentVC = newViewController;
+            
+            [self.view addSubview:_currentVC.view];
+            
+        }else{
+            _currentVC = oldViewController;
+        }
+    }];
+}
+- (void)adjustLayoutsubViews {
+    
+    UIDeviceOrientation orientation = [[UIDevice currentDevice]orientation];
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+    if(!(IOS8)) {
+//        orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if(UIDeviceOrientationIsLandscape(orientation) || orientation == UIDeviceOrientationUnknown ||
+           orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown) {
+            //landscape assume  width > height
+            if(width<height) {
+                CGFloat temp = width;
+                width = height;
+                height = temp;
+            }
+        }
+    }
+    //the furtherst distance in the world
+    //is not life and death
+    //but when I stand in front of you
+    //ye you don't know I love you
+    mPlayerView.frame = CGRectMake(0,0,width,width*9.0/16);
+    
+    //when change the view size, need to reset the view to the play.
+    mPlayer.view = mPlayerView;
+    
+    CGFloat space = 15;
+    rotateBtn.frame = CGRM(CGMAX_X(mPlayerView.frame)-space-rotateBtnWidth, CGMAX_Y(mPlayerView.frame)-space-rotateBtnWidth, rotateBtnWidth, rotateBtnWidth);
+    closeVoiceBtn.frame = CGRM(CGMIN_X(rotateBtn.frame), CGMIN_Y(rotateBtn.frame)-space-rotateBtnWidth, rotateBtnWidth, rotateBtnWidth);
+}
+- (void) changeSubviewsFrameExceptNavIsPortrait:(BOOL)isPortrait  {
+    
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = [UIScreen mainScreen].bounds.size.height;
+    
+    if (isPortrait) {//竖屏
+        self.view.frame = CGRM(0, NAV_STATUS_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT-NAV_STATUS_HEIGHT);
+        mPlayerView.frame = CGRectMake(0,0,width,width*9.0/16);
+
+        for (int i = 0; i < self.childViewControllers.count; i++) {
+            UIViewController * vc = self.childViewControllers[i];
+            vc.view.hidden = NO;
+        }
+        [self fitFrameForChildViewController:vcArr[0]];
+    }else {
+        //播放器背景视图视图坐标调整
+        mPlayerView.frame = CGRectMake(0, -(self.navigationController.navigationBar.frame.size.height+[UIApplication sharedApplication].statusBarFrame.size.height), width, height+12);
+        for (int i = 0; i < self.childViewControllers.count; i++) {
+            UIViewController * vc = self.childViewControllers[i];
+            vc.view.hidden = YES;
+        }
+    }
+}
+- (void) changeRotateBtnFrame:(BOOL) isPotraitBool {
+    
+    CGFloat space = 15;
+    
+    rotateBtn.frame = CGRM(CGMAX_X(mPlayerView.frame)-space-rotateBtnWidth, CGMAX_Y(mPlayerView.frame)-space-rotateBtnWidth-(isPotraitBool?(0):(TABBAR_HEIGHT)), rotateBtnWidth, rotateBtnWidth);
+    
+    closeVoiceBtn.frame = CGRM(CGMIN_X(rotateBtn.frame), CGMIN_Y(rotateBtn.frame)-space-rotateBtnWidth, rotateBtnWidth, rotateBtnWidth);
+}
+- (void) adjustPlayerUrlErrorBtnFrame {
+    _playerUrlErrorBtn.frame = CGRM(0, 0, mPlayerView.width, mPlayerView.height);
+}
+#pragma mark - 点击事件
+//返回按钮点击事件
+- (void) backItemWithCustemViewBtnClicked {
+    
+    [self switchToPortrait];
+    rotateBtn.selected = NO;
+    self.tabBarController.selectedIndex = 0;//返回首页
+}
+//设置导航栏右边按钮
+- (void) rightBarImageBtnClciked{
+    [self removeOrAddNavFloorMenuBgIMV];
+}
+
+//菜单浮层上按钮点击事件
+- (void) tempMenuBtnClicked:(UIButton *)sender {//600+3
+    sender.selected = !sender.selected;
+    
+    switch (sender.tag) {
+        case 600:
+        {//查看历史
+            [self seeHistoryLive];
+        }
+            break;
+        case 601:
+        {//分享直播
+            [mPlayer pause];//暂停直播
+            [self removeOrAddNavFloorMenuBgIMV];//移除菜单视图
+//            [self goShare];
+            [self.customShare createShareUI];
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+//分享按钮点击事件
+- (void) shareBtnClicked:(UIButton*)sender {//900+3
+    
+}
+//播放器视图点击手势
+- (void) mPlayerViewTaped {
+    
+    UIDeviceOrientation toInterfaceOrientation = [[UIDevice currentDevice] orientation];
+    
+    if (toInterfaceOrientation == UIDeviceOrientationLandscapeLeft || toInterfaceOrientation == UIDeviceOrientationLandscapeRight) {//横屏
+        [navFloorMenuBgIMV removeFromSuperview];
+        if (rotateBtn.hidden) {//show
+            [self showRotateVoiceBtn];
+            self.navigationController.navigationBar.hidden = NO;
+            
+        }else {//hidden
+            [self hidRotateVoiceBtn];
+            self.navigationController.navigationBar.hidden = YES;
+
+        }
+    }
+}
+//屏幕旋转点击事件
+- (void) rotateBtnClicked:(UIButton*)sender {
+    sender.selected = !sender.selected;
+
+    if (self.navigationController.navigationBar.hidden) {
+        self.navigationController.navigationBar.hidden = NO;
+    }
+    //手动切换横竖屏
+    sender.selected?[self switchToLandscape]:[self switchToPortrait];
+    //移除更多菜单视图
+    [self removeNavFloorMenuIMV];
+    
+    UIDeviceOrientation toInterfaceOrientation = [[UIDevice currentDevice] orientation];
+    if (toInterfaceOrientation == UIDeviceOrientationLandscapeLeft || toInterfaceOrientation == UIDeviceOrientationLandscapeRight) {//横屏
+        self.voiceModel.rotateBtnIsClickedBool = YES;
+    }
+}
+//静音点击事件
+- (void) closeVoiceBtnClicked:(UIButton*)sender {
+    sender.selected = !sender.selected;
+    self.voiceModel.needCloseVoiceBool = sender.selected;//关闭声音bool
+    _appDelegate.isCloseVoiceBool = sender.selected;
+}
+//老师暂时离开，去看历史直播
+- (void) playerUrlErrorBtnClicked:(UIButton*)sender {
+    [self seeHistoryLive];
+}
+#pragma mark - 辅助方法
+- (void) registOrCancellVoiceAndRotateNotificationWillAppearBool:(BOOL)willAppearBool {
+    if (willAppearBool) {
+        //viewWillAppear
+        //监听旋转方向
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
+        //KVO
+        //静音监听
+        [self.voiceModel addObserver:self forKeyPath:@"needCloseVoiceBool" options:NSKeyValueObservingOptionNew context:nil];
+        
+    }else {
+        //viewWillDisappear
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];//注销旋转屏幕的监听
+        //KVO
+        [self.voiceModel removeObserver:self forKeyPath:@"needCloseVoiceBool"];//注销静音监听
+    }
+}
+- (void) removeOrAddNavFloorMenuBgIMV {
+    if (navFloorMenuBgIMV.alpha==0) {//添加到window上
+        [self addNavFloorMenuBgIMV];
+
+    }else {//
+        navFloorMenuBgIMV.alpha = 0;
+        [self removeNavFloorMenuIMV];
+    }
+}
+- (void) removeNavFloorMenuIMV {
+    navFloorMenuBgIMV.alpha = 0;
+    [navFloorMenuBgIMV removeFromSuperview];
+}
+- (void) addNavFloorMenuBgIMV {
+    navFloorMenuBgIMV.alpha = 1;
+    [_appDelegate.window addSubview:navFloorMenuBgIMV];
+}
+- (void) showRotateVoiceBtn {
+//    self.navigationController.navigationBar.hidden = NO;
+    rotateBtn.hidden = NO;
+    closeVoiceBtn.hidden = NO;
+    
+}
+- (void) hidRotateVoiceBtn {
+//    self.navigationController.navigationBar.hidden = YES;
+    rotateBtn.hidden = YES;
+    closeVoiceBtn.hidden = YES;
+}
+//去看历史直播
+- (void) seeHistoryLive {
+    [self switchToPortrait];
+    HDStockNavigationController * infoNav = self.tabBarController.childViewControllers[2];
+    HDInfoMationViewController * infoVC = infoNav.childViewControllers[0];
+    infoVC.selectedVC = 2;
+    infoVC.fromwhere = @"直播历史";
+    [self.tabBarController setSelectedViewController:infoNav];//返回资讯
+}
+- (void) showLiveViewReplaceBtn {
+    self.playerUrlErrorBtn.hidden = NO;
+    [self.playerUrlErrorBtn removeFromSuperview];
+    [mPlayerView addSubview:self.playerUrlErrorBtn];
+    [self hidRotateVoiceBtn];
+}
+- (void) removeLiveReplaceBtn {
+    self.playerUrlErrorBtn.hidden = YES;
+    [self.playerUrlErrorBtn removeFromSuperview];
+    [self showRotateVoiceBtn];
+}
+//设置是否需要静音
+- (void) setVoiceStatus {
+    if (_appDelegate.isCloseVoiceBool) {//需要静音
+        self.voiceModel.needCloseVoiceBool = YES;
+    }else {
+        self.voiceModel.needCloseVoiceBool = NO;
+    }
+}
+- (void)jugeWithStr:(NSString *)alertStr {
+    if (IOS8) {
+        //执行操作
+        WEAK_SELF;
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"温馨提示" message:alertStr preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *actionContinue = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel  handler:nil];
+        [alertController addAction:actionContinue];
+        [weakSelf presentViewController:alertController animated:YES completion:nil];
+    }else {
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:alertStr delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:@"", nil];
+        [alter show];
+    }
+}
+
+#pragma mark - 屏幕旋转
+- (BOOL)shouldAutorotate
+{
+    if (_appDelegate.allowRotation == 1) {
+        //视频直播
+        return YES;
+    }
+    return NO;
+}
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    if (_appDelegate.allowRotation == 1) {
+        return (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight);
+    } else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+}
+//点击按钮旋转到横屏
+- (void)switchToLandscape
+{
+    [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIDeviceOrientationLandscapeRight] forKey:@"orientation"];
+    
+}
+
+//点击返回旋转到竖屏
+- (void)switchToPortrait
+{
+    [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:UIDeviceOrientationPortrait] forKey:@"orientation"];
+}
+- (void)orientationDidChange
+{
+    [self removeNavFloorMenuIMV];
+    navFloorMenuBgIMV.frame = CGRM(SCREEN_SIZE_WIDTH-10-106, NAV_STATUS_HEIGHT-10, 106, 118*2/3.0+1);
+    
+    UIDeviceOrientation toInterfaceOrientation = [[UIDevice currentDevice] orientation];
+    if (!((toInterfaceOrientation == UIDeviceOrientationPortraitUpsideDown)|| (toInterfaceOrientation == UIDeviceOrientationFaceUp) || (toInterfaceOrientation == UIDeviceOrientationFaceDown) || (toInterfaceOrientation == UIDeviceOrientationUnknown))) {
+        
+        if (toInterfaceOrientation == UIDeviceOrientationPortrait){
+            //竖屏
+            if (self.playerUrlErrorBtn.hidden) {
+                [self showRotateVoiceBtn];
+            }
+            [self changeSubviewsFrameExceptNavIsPortrait:YES];
+            [self changeRotateBtnFrame:YES];//改变旋转按钮的坐标
+            if (self.voiceModel.rotateBtnIsClickedBool) {
+                [self setUpNormalAllSubViews];
+            }
+            self.navigationController.navigationBar.hidden = NO;
+            
+        }else if (toInterfaceOrientation == UIDeviceOrientationLandscapeLeft || toInterfaceOrientation == UIDeviceOrientationLandscapeRight) {
+            //横屏
+            [self.customShare dismiss];
+//            if (!self.playerUrlErrorBtn.hidden) {
+                [self hidRotateVoiceBtn];
+//            }
+            [self changeSubviewsFrameExceptNavIsPortrait:NO];
+            [self changeRotateBtnFrame:NO];
+            self.navigationController.navigationBar.hidden = YES;
+
+        }
+        [self adjustPlayerUrlErrorBtnFrame];
+
+    }
+}
+
+#pragma - mark - 直播
+
+-(AliVcAccesskey*)getAccessKeyIDSecret
+{
+    AliVcAccesskey* accessKey = [[AliVcAccesskey alloc] init];
+    accessKey.accessKeyId = LiveAccessKeyID;
+    accessKey.accessKeySecret = LiveAccessKeySecret;
+    return accessKey;
+}
+-(void)prepareForLive {
+    [AliVcMediaPlayer setAccessKeyDelegate:self];
+    NSURL* url = [NSURL URLWithString:LiveAddressUrl];
+    mSourceURL = [url copy];
+}
+- (void) SetMoiveSource:(NSURL*)url
+{
+    mSourceURL = [url copy];
+}
+
+- (void) setUpLive {
+    // 阻止锁屏
+    //进入照相界面，再退出照相。  阻止锁屏功能无效了:解决：放在-(void)viewWillAppear:(BOOL)animated里面
+    [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
+    
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    mPaused = false;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(becomeActive)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(resignActive)
+                                                 name:UIApplicationWillResignActiveNotification
+                                               object:nil];
+    [self PlayMoive];
+    
+    mPlayer.scalingMode = scalingModeAspectFitWithCropping;
+    
+    [self addNetWorkCheckNotification];//添加网络监听
+}
+- (void) addNetWorkCheckNotification {
+    //add network notification
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkStateChange) name:kReachabilityChangedNotification object:nil];
+    self.conn = [Reachability reachabilityForInternetConnection];
+    [self.conn startNotifier];
+}
+- (void)networkStateChange
+{
+    //网络流判断网络状态
+    if (mSourceURL && ![mSourceURL isFileURL]) {
+        [self checkNetworkState];
+    }
+}
+
+- (void)checkNetworkState
+{
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    [[AFNetworkReachabilityManager sharedManager ] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        if (status == AFNetworkReachabilityStatusReachableViaWiFi) {
+            NSLog(@"checkNetworkState-有wifi");
+            if (self.tabBarController.selectedIndex == 3) {
+                if (isReconnectWifi) {//重连wifi
+                    if (mPlayer) {
+                        if (_appDelegate.isHaveLivePlayed) {
+                            [mPlayer play];
+                        }else {
+                            [self reconnectToVedioUrl];
+                        }
+                    }
+                    isReconnectWifi = NO;
+                }else if (isReconnectToVedioUrlBool){//重连播放地址
+                    isReconnectToVedioUrlBool = NO;
+                    [self reconnectToVedioUrl];
+                }
+                
+                if (!self.playerUrlErrorBtn.hidden) {
+                    [self removeLiveReplaceBtn];
+                }
+                [[vcArr[0] wkWeb].scrollView.mj_header beginRefreshing];
+            }else {
+                [mPlayer pause];
+            }
+        }else if (status == AFNetworkReachabilityStatusReachableViaWWAN){
+            NSLog(@"checkNetworkState-有手机自带网络");
+            [mPlayer pause];
+            isPhoneDataUrl = YES;//4G/3G网
+            isReconnectWifi = YES;
+            if (self.tabBarController.selectedIndex == 3) {
+                if (IOS8) {
+                    //执行操作
+                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"你当前使用的是手机自带网络" preferredStyle:UIAlertControllerStyleAlert];
+                    
+                    WEAK_SELF;
+                    UIAlertAction *actionQuik = [UIAlertAction actionWithTitle:@"退出观看" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                        STRONG_SELF;
+                        [strongSelf performSelector:@selector(alertQuickSeeLive)];
+                    }];
+                    
+                    UIAlertAction *actionContinue = [UIAlertAction actionWithTitle:@"继续观看" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                        STRONG_SELF;
+                        [strongSelf performSelector:@selector(alertContinueSeeLive)];
+                    }];
+                    
+                    [alertController addAction:actionQuik];
+                    [alertController addAction:actionContinue];
+                    [self presentViewController:alertController animated:YES completion:nil];
+                }else {
+                    UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:@"你当前使用的是手机自带网络" delegate:nil cancelButtonTitle:@"继续观看" otherButtonTitles:@"退出观看", nil];
+                    [alter show];
+                }
+            }
+        }else {
+            NSLog(@"checkNetworkState-没有网");
+            NSLog(@"checkNetworkState-case没有网络");
+            isReconnectWifi = YES;
+            [MBProgressHUD hideHUDForView:mPlayerView];
+            if (self.tabBarController.selectedIndex == 3) {
+                [[vcArr[0] wkWeb].scrollView.mj_header endRefreshing];
+                if (IOS8) {
+                    //执行操作
+                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"你的网络已断开" preferredStyle:UIAlertControllerStyleAlert];
+                    WEAK_SELF;
+                    UIAlertAction *actionCancel = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                        STRONG_SELF;
+                        [strongSelf performSelector:@selector(alertLoadUrlFailedCanRetry)];
+                        
+                    }];
+                    [alertController addAction:actionCancel];
+                    [self presentViewController:alertController animated:YES completion:nil];
+                }else {
+                    UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"" message:@"你的网络已断开" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                    [alter show];
+                }
+
+            }
+            [mPlayer pause];
+        }
+    }];
+}
+
+- (void)becomeActive{
+    [self EnterForeGroundPlayVideo];
+}
+
+- (void)resignActive{
+    [self EnterBackGroundPauseVideo];
+}
+
+-(void) EnterBackGroundPauseVideo
+{
+    if(mPlayer && mPaused == NO) {
+        [mPlayer pause];
+    }
+}
+
+-(void) EnterForeGroundPlayVideo
+{
+    if(mPlayer && mPaused == NO&&self.tabBarController.selectedIndex==3) {
+        [mPlayer play];
+    }
+    
+}
+- (void) PlayMoive
+{
+    if(mSourceURL == nil)
+        return;
+    
+    //new the player
+    mPlayer = [[AliVcMediaPlayer alloc] init];
+    
+//    //add player controls
+    [self setupControls];
+    
+    //create player, and  set the show view
+    [mPlayer create:mPlayerView];
+    
+    //register notifications
+    [self addPlayerObserver];
+    
+    mPlayer.mediaType = MediaType_AUTO;
+    mPlayer.timeout = 25000;
+    mPlayer.dropBufferDuration = 8000;
+    
+    
+    replay = NO;
+    bSeeking = NO;
+    
+    //prepare and play the video
+    AliVcMovieErrorCode err = [mPlayer prepareToPlay:mSourceURL];
+    NSLog(@"%ld",(long)err);
+    if(err != ALIVC_SUCCESS) {
+        NSLog(@"preprare failed,error code is %d",(int)err);
+        return;
+    }
+    
+    err = [mPlayer play];
+    NSLog(@"%ld",(long)err);
+
+    if(err != ALIVC_SUCCESS) {
+        NSLog(@"play failed,error code is %d",(int)err);
+        return;
+    }
+    [MBProgressHUD showHUDAddedTo:mPlayerView animated:YES];
+    
+}
+
+- (void) reconnectToVedioUrl {
+    [mPlayer stop];
+    [MBProgressHUD showHUDAddedTo:mPlayerView animated:YES];
+    [self showRotateVoiceBtn];//显示声音和旋转按钮
+    isReconnectToVedioUrlBool = NO;//重连后不再重连
+    _appDelegate.isCloseVoiceBool = NO;
+    self.voiceModel.needCloseVoiceBool = NO;
+    closeVoiceBtn.selected = NO;
+    replay = YES;
+    [self replay];
+    
+}
+-(void)replay
+{
+    [mPlayer prepareToPlay:mSourceURL];
+    replay = NO;
+    bSeeking = NO;
+    [mPlayer play];
+    [self setVoiceStatus];//设置是否需要静音
+}
+
+//recieve finish notification
+- (void)OnVideoFinish:(NSNotification *)notification {
+    replay = YES;
+    [self showLiveViewReplaceBtn];//播放完成,显示去看历史直播按钮
+    if (self.tabBarController.selectedIndex == 3) {
+        if (IOS8) {
+            //执行操作
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"播放完成" message:@"播放完成" preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *actionCancel = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil];
+            
+            [alertController addAction:actionCancel];
+            [self presentViewController:alertController animated:YES completion:nil];
+            
+        }else {
+            UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"播放完成" message:@"播放完成" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            
+            [alter show];
+        }
+    }
+}
+
+
+//recieve start cache notification
+- (void)OnStartCache:(NSNotification *)notification {
+    //    [self showLoadingIndicators];
+    [MBProgressHUD showHUDAddedTo:mPlayerView animated:YES];
+
+}
+
+//recieve end cache notification
+- (void)OnEndCache:(NSNotification *)notification {
+    //    [self hideLoadingIndicators];
+    [MBProgressHUD hideHUDForView:mPlayerView];
+}
+
+-(void)addPlayerObserver
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(OnVideoPrepared:)
+                                                 name:AliVcMediaPlayerLoadDidPreparedNotification object:mPlayer];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(OnVideoError:)
+                                                 name:AliVcMediaPlayerPlaybackErrorNotification object:mPlayer];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(OnVideoFinish:)
+                                                 name:AliVcMediaPlayerPlaybackDidFinishNotification object:mPlayer];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(OnStartCache:)
+                                                 name:AliVcMediaPlayerStartCachingNotification object:mPlayer];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(OnEndCache:)
+                                                 name:AliVcMediaPlayerEndCachingNotification object:mPlayer];
+}
+
+-(void)removePlayerObserver
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AliVcMediaPlayerLoadDidPreparedNotification object:mPlayer];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AliVcMediaPlayerPlaybackErrorNotification object:mPlayer];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AliVcMediaPlayerPlaybackDidFinishNotification object:mPlayer];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AliVcMediaPlayerStartCachingNotification object:mPlayer];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AliVcMediaPlayerEndCachingNotification object:mPlayer];
+}
+//recieve prepared notification
+- (void)OnVideoPrepared:(NSNotification *)notification {
+
+    //    [self hideLoadingIndicators];
+    [MBProgressHUD hideHUDForView:mPlayerView];
+    _appDelegate.isHaveLivePlayed = YES;
+    
+    WEAK_SELF;
+    dispatch_time_t timer = dispatch_time(DISPATCH_TIME_NOW, 4 * NSEC_PER_SEC);
+    dispatch_after(timer, dispatch_get_main_queue(), ^{
+        STRONG_SELF;
+        [strongSelf showRotateVoiceBtn];//显示旋转按钮
+    });
+    NSLog(@"OnVideoPrepared+?");
+}
+
+//recieve error notification
+- (void)OnVideoError:(NSNotification *)notification {
+    replay = YES;
+    //    [playBtn setSelected:YES];
+    //    [self showControls:nil];
+    
+    [MBProgressHUD hideHUDForView:mPlayerView];
+    NSString* error_msg = @"未知错误";
+    AliVcMovieErrorCode error_code = mPlayer.errorCode;
+    switch (error_code) {
+        case ALIVC_ERR_FUNCTION_DENIED:
+            error_msg = @"未授权";
+            break;
+        case ALIVC_ERR_ILLEGALSTATUS:
+            error_msg = @"非法的播放流程";
+            break;
+        case ALIVC_ERR_INVALID_INPUTFILE:
+            error_msg = @"无法打开";
+            //            [self hideLoadingIndicators];
+            [MBProgressHUD hideHUDForView:mPlayerView animated:YES];
+            break;
+        case ALIVC_ERR_NO_INPUTFILE:
+            error_msg = @"无输入文件";
+            //            [self hideLoadingIndicators];
+            [MBProgressHUD hideHUDForView:mPlayerView animated:YES];
+            break;
+        case ALIVC_ERR_NO_NETWORK:
+            error_msg = @"网络连接失败";
+            break;
+        case ALIVC_ERR_NO_SUPPORT_CODEC:
+            error_msg = @"不支持的视频编码格式";
+            //            [self hideLoadingIndicators];
+            [MBProgressHUD hideHUDForView:mPlayerView animated:YES];
+            break;
+        case ALIVC_ERR_NO_VIEW:
+            error_msg = @"无显示窗口";
+            //            [self hideLoadingIndicators];
+            [MBProgressHUD hideHUDForView:mPlayerView animated:YES];
+            break;
+        case ALIVC_ERR_NO_MEMORY:
+            error_msg = @"内存不足";
+            break;
+        case ALIVC_ERR_DOWNLOAD_TIMEOUT:
+            error_msg = @"网络超时";
+            NSLog(@"%ld",(long)error_code);
+            break;
+        case ALIVC_ERR_UNKOWN:
+            error_msg = @"未知错误";
+            break;
+        default:
+            break;
+    }
+    NSLog(@"error_msg--%@",error_msg);
+
+    //NSLog(error_msg);
+    //the error message is important when error_cdoe > 500
+    
+    if(error_code > 500 || error_code == ALIVC_ERR_FUNCTION_DENIED) {
+        
+        if (error_code == ALIVC_ERR_DOWNLOAD_TIMEOUT) {//连接超时
+            
+            [mPlayer pause];
+//            __weak NSString * thyError_msg = error_msg;
+            [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+            [[AFNetworkReachabilityManager sharedManager ] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+                
+                if (status == AFNetworkReachabilityStatusReachableViaWiFi || status == AFNetworkReachabilityStatusReachableViaWWAN) {
+                    if (self.tabBarController.selectedIndex == 3) {
+                        if (IOS8) {
+                            //执行操作
+                            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"错误提示" message:error_msg preferredStyle:UIAlertControllerStyleAlert];
+                            
+                            WEAK_SELF;
+                            UIAlertAction *actionDefault = [UIAlertAction actionWithTitle:@"等待" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                                STRONG_SELF;
+                                [strongSelf performSelector:@selector(alertWaitConnection)];
+                            }];
+                            
+                            UIAlertAction *actionCancel = [UIAlertAction actionWithTitle:@"重新连接" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+                                STRONG_SELF;
+                                [strongSelf performSelector:@selector(alertReconnection)];
+                                
+                            }];
+                            
+                            [alertController addAction:actionDefault];
+                            [alertController addAction:actionCancel];
+                            [self presentViewController:alertController animated:YES completion:nil];
+                        }else {
+                            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"错误提示"
+                                                                            message:error_msg
+                                                                           delegate:self
+                                                                  cancelButtonTitle:@"等待"
+                                                                  otherButtonTitles:@"重新连接",nil];
+                            [alert show];
+                        }
+                    }
+                }
+            }];
+        }else {//连接失败的提示
+            [mPlayer reset];
+            [self showLiveViewReplaceBtn];//显示直播view占位按钮
+        }
+    }
+}
+
+#pragma mark - alert
+//你的网络已断开alert
+- (void) showUrlBreakAlert {
+    if (IOS8) {
+        //执行操作
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"你的网络已断开" preferredStyle:UIAlertControllerStyleAlert];
+        WEAK_SELF;
+        UIAlertAction *actionCancel = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive  handler:^(UIAlertAction * _Nonnull action) {
+            STRONG_SELF;
+            [strongSelf performSelector:@selector(alertLoadUrlFailedCanRetry)];
+            
+        }];
+        [alertController addAction:actionCancel];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }else {
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"" message:@"你的网络已断开" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alter show];
+    }
+}
+//alert等待
+- (void) alertWaitConnection {
+    
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    [[AFNetworkReachabilityManager sharedManager ] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        if (status == AFNetworkReachabilityStatusReachableViaWiFi || status == AFNetworkReachabilityStatusReachableViaWWAN) {
+            NSLog(@"alertWaitConnection-有网");
+            if (mPlayer) {
+                [mPlayer play];//继续播放
+            }
+        }else {
+            NSLog(@"alertWaitConnection-没有网");
+            isReconnectWifi = YES;
+        }
+    }];
+}
+//alert重新连接
+- (void) alertReconnection {
+    
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    [[AFNetworkReachabilityManager sharedManager ] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        if (status == AFNetworkReachabilityStatusReachableViaWiFi || status == AFNetworkReachabilityStatusReachableViaWWAN) {
+            NSLog(@"alertReconnection-有网");
+            if (mPlayer) {
+                [self reconnectToVedioUrl];//重连
+            }
+        }else {
+            NSLog(@"alertReconnection-没有网");
+            isReconnectToVedioUrlBool = YES;
+            [self showUrlBreakAlert];
+        }
+    }];
+}
+- (void) alertLoadUrlFailedCanRetry {
+
+    isReconnectWifi = YES;
+}
+// alert退出观看
+- (void) alertQuickSeeLive {
+    [self backItemWithCustemViewBtnClicked];
+}
+// alert继续观看
+- (void) alertContinueSeeLive {
+    [mPlayer play];
+    [self removeLiveReplaceBtn];
+}
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (isPhoneDataUrl) {
+        //4G网
+        if (alertView.numberOfButtons == 2)
+        {//2个按钮
+            switch (buttonIndex) {
+                case 0:
+                {//退出观看
+                    [self alertQuickSeeLive];
+                }
+                    break;
+                case 1:
+                {//继续观看
+                    [self alertContinueSeeLive];
+                    if (!self.playerUrlErrorBtn.hidden) {
+                        [self removeLiveReplaceBtn];
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    else {
+        
+        if (alertView.numberOfButtons == 2)
+        {
+            switch (buttonIndex) {
+                case 0:
+                {//等待
+                    [mPlayer play];
+                }
+                    break;
+                case 1:
+                {//重新连接
+                    [self reconnectToVedioUrl];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            //网络断开
+            isReconnectWifi = YES;
+        }
+    }
+}
+#pragma mark _ foo
+
+-(void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];//即使没有显示在window上，也不会自动的将self.view释放。注意跟ios6.0之前的区分
+    // Add code to clean up any of your own resources that are no longer necessary.
+    // 此处做兼容处理需要加上ios6.0的宏开关，保证是在6.0下使用的,6.0以前屏蔽以下代码，否则会在下面使用self.view时自动加载viewDidUnLoad
+    if ([[UIDevice currentDevice].systemVersion floatValue] >= 6.0) {
+        //需要注意的是self.isViewLoaded是必不可少的，其他方式访问视图会导致它加载，在WWDC视频也忽视这一点。
+        if (self.isViewLoaded && !self.view.window)// 是否是正在使用的视图
+        {
+            // Add code to preserve data stored in the views that might be
+            // needed later.
+            // Add code to clean up other strong references to the view in
+            // the view hierarchy.
+            //self.view = nil;// 目的是再次进入时能够重新加载调用viewDidLoad函数。
+            
+            //判断一下view是否是window的一部分，如果不是，那么可以放心的将self.view 置为空，以换取更多可用内存。
+            if ([self isViewLoaded] && self.view.window == nil) {
+                self.view = nil;
+            }
+            
+        }
+    }
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

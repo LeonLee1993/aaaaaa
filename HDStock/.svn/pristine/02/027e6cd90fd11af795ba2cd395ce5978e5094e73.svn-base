@@ -1,0 +1,58 @@
+//
+//  PCMyPlanViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/14.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "PCMyPlanViewController.h"
+#import "MyPlanTableViewCell.h"
+@interface PCMyPlanViewController ()<UITableViewDataSource,UITableViewDelegate>
+
+@end
+
+@implementation PCMyPlanViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setHeader:@"我的计划"];
+    [self initScrollView];
+    [self setTableViewsWithCellKindsArray:@[@""]];
+    [self setTableView];
+}
+
+- (void)setTableView{
+    [self.scrollView setFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT-64)];
+    self.scrollView.contentSize = CGSizeMake(SCREEN_WIDTH, SCREEN_HEIGHT-64);
+    self.tableView1.delegate = self;
+    self.tableView1.dataSource = self;
+    self.tableView1.backgroundColor = RGBCOLOR(243, 243, 243);
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"MyPlanTableViewCell" bundle:nil] forCellReuseIdentifier:@"MyPlanTableViewCell"];
+    self.tableView1.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView1.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-64);
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 5;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(tableView == self.tableView1){
+        MyPlanTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MyPlanTableViewCell"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        return cell;
+    }else{
+        return nil;
+    }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (tableView == self.tableView1) {
+        return  283*SCREEN_WIDTH/375+10;
+    }else{
+        return 0;
+    }
+}
+
+@end

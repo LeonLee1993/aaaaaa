@@ -1,0 +1,101 @@
+//
+//  HDLiveViewController.m
+//  HDStock
+//
+//  Created by hd-app01 on 16/11/15.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDLiveViewController.h"
+#import "HDLiveInerViewController.h"
+
+@interface HDLiveViewController ()<UITableViewDelegate,UITableViewDataSource> {
+    UITableView * _tb;
+    NSTimer * timerZ;
+}
+
+@end
+
+@implementation HDLiveViewController
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setNav];
+    [self createTB];
+    
+}
+- (void) setNav {
+    self.title = @"直播";
+}
+#pragma mark - 创建表格
+- (void ) createTB {
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    UITableView * tb = [[UITableView alloc] initWithFrame:CGRectMake(0, NAV_STATUS_HEIGHT, SCREEN_SIZE_WIDTH, SCREEN_SIZE_HEIGHT - NAV_STATUS_HEIGHT-TABBAR_HEIGHT+20) style:(UITableViewStyleGrouped)];
+//    tb.backgroundColor = [UIColor redColor];
+//    tb.tableFooterView = [[UIView alloc] init];
+    tb.tableHeaderView = [[UIView alloc] initWithFrame:CGRM(0, 0, SCREEN_WIDTH, 0.1f)];
+    tb.delegate = self;
+    tb.dataSource = self;
+    tb.bounces = NO;
+    _tb = tb;
+    [self.view addSubview:_tb];
+}
+
+
+#pragma mark - UITableViewDelegate
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
+    return 100;
+}
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 1;
+}
+-(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell * cell = [tableView cellForRowAtIndexPath:indexPath];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:(UITableViewCellStyleDefault) reuseIdentifier:@"cell"];
+    }
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.textLabel.text = @"888";
+    return cell;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 60;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    if (section==9) {
+        return 0.1f;
+    }
+    return 13.f;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    
+    return 0.1f;
+}
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    HDLiveInerViewController * vc = [HDLiveInerViewController new];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+
+
+
+#pragma mark - foo
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

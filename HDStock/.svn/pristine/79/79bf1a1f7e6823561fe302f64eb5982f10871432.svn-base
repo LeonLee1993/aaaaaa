@@ -1,0 +1,206 @@
+//
+//  ProductDetailViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/12/13.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "ProductDetailViewController.h"
+#import <WebKit/WebKit.h>
+#import "HDLiveSubmitOrderViewController.h"
+#import "panToPopObject.h"
+#import "HDShareCustom.h"
+#import <ShareSDK/ShareSDK.h>
+#import <ShareSDKConnector/ShareSDKConnector.h>
+#import "fullPageFailLoadView.h"
+#import "AppDelegate.h"
+#import "PCSignInViewController.h"
+
+@interface ProductDetailViewController ()<thyShareCustomDlegate,fullPageFailLoadViewDelegate>
+@property (nonatomic,strong) WKWebView * webView;
+@property (nonatomic,strong) HDShareCustom * customShare;
+@end
+
+@implementation ProductDetailViewController{
+    fullPageFailLoadView * fullFailLoad;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setNavCustemViewForLeftItemWithImage:imageNamed(@"Live_back") title:@"返回" titleFont:[UIFont systemFontOfSize:(15)] titleCoclor:[UIColor clearColor] custemViewFrame:CGRM(0, 26, 56, 44)];
+    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_urlStr]]];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"分享" style:(UIBarButtonItemStylePlain) target:self action:@selector(shareButtonClicked)];
+    [self.navigationItem.rightBarButtonItem setTintColor:[UIColor whiteColor]];
+    [self setBuyButton];
+    [self panToPopView];
+    _customShare = [[HDShareCustom alloc]init];
+    fullFailLoad = [[fullPageFailLoadView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT-64)];;
+    fullFailLoad.delegate = self;
+}
+
+
+-(WKWebView *)webView{
+    if(_webView == nil){
+        _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-50-64)];
+        [self.view addSubview:_webView];
+    }
+    return _webView;
+}
+
+
+- (void)shareButtonClicked{
+    //分享
+    [_customShare createShareUI];
+    _customShare.shareCustomDlegate = self;
+    _customShare.comFromIndex = 0;
+    WEAK_SELF;
+    //判断是否安装了接受分享的设备
+    _customShare.isInstalledAlertBlock = ^(NSString * isInstalledStr){
+        STRONG_SELF;
+        [strongSelf jugeWithStr:isInstalledStr];
+    };
+    //开始分享
+    _customShare.sharePlatBlock = ^(NSInteger platType){
+        STRONG_SELF;
+        NSString * str = @"http://gk.cdtzb.com/wap/index";
+        
+        NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
+        if (platType == 2){//微博
+            [shareParams SSDKSetupSinaWeiboShareParamsByText:[NSString stringWithFormat:@"年末行情如何把握，尽在股哥直播:%@",[NSURL URLWithString:str] ]
+                                                       title:weakSelf.title
+                                                       image:[UIImage imageNamed:@"shareIcon"]
+                                                         url:[NSURL URLWithString:str]
+                                                    latitude:0
+                                                   longitude:0
+                                                    objectID:nil
+                                                        type:SSDKContentTypeAuto];
+            [shareParams SSDKEnableUseClientShare];
+            [strongSelf.customShare gotoShareWithContent:shareParams];
+        }else if (platType == 0 || platType == 1 || platType == 3) {//微信好友，微信朋友圈，QQ
+            //1、创建分享参数
+            NSArray* imageArray = @[[UIImage imageNamed:@"shareIcon"]];
+            if (imageArray) {
+                NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
+                [shareParams SSDKSetupShareParamsByText:@"年末行情如何把握，尽在股哥直播"
+                                                 images:imageArray
+                                                    url:[NSURL URLWithString:str]
+                                                  title:weakSelf.title
+                                                   type:SSDKContentTypeAuto];
+                [strongSelf.customShare gotoShareWithContent:shareParams];
+            }
+        }
+    };
+    
+    //分享状态
+    self.customShare.shareStatusBlock = ^(NSInteger shareState){
+        STRONG_SELF;
+        switch (shareState) {
+            case SSDKResponseStateSuccess:
+            {
+                [MBProgressHUD showMessage:@"分享成功" ToView:strongSelf.view RemainTime:2];
+            }
+                break;
+            case SSDKResponseStateFail:
+            {
+                [MBProgressHUD showMessage:@"分享失败" ToView:strongSelf.view RemainTime:2];
+            }
+                break;
+            case SSDKResponseStateCancel:
+            {
+                [MBProgressHUD showMessage:@"取消分享" ToView:strongSelf.view RemainTime:2];
+                
+            }
+                break;
+            default:
+                break;
+        }
+    };
+}
+
+- (void)jugeWithStr:(NSString *)alertStr {
+    if (IOS8) {
+        //执行操作
+        WEAK_SELF;
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"温馨提示" message:alertStr preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *actionContinue = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel  handler:nil];
+        [alertController addAction:actionContinue];
+        [weakSelf presentViewController:alertController animated:YES completion:nil];
+    }else {
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:alertStr delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:@"", nil];
+        [alter show];
+    }
+}
+
+
+- (void)setBuyButton{
+    UIButton * buyButton = [[UIButton alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-64-50, SCREEN_WIDTH, 50)];
+    [buyButton setTitle:[NSString stringWithFormat:@"购买( ¥%@ )",_priceStr] forState:UIControlStateNormal];
+    buyButton.backgroundColor = RGBCOLOR(25, 121, 202);
+    [buyButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [buyButton addTarget:self action:@selector(goToPayPage) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:buyButton];
+}
+
+- (void)goToPayPage{
+    
+    NSDictionary *dic = [[LYCUserManager informationDefaultUser] getUserInfoDic];
+
+    if([dic[PCUserState] isEqualToString:@"success"]){
+        HDLiveSubmitOrderViewController * submitOrder = [[HDLiveSubmitOrderViewController alloc]init];
+        submitOrder.needPayMoneyStr = _priceStr;
+        submitOrder.productId = _idStr;
+        [self.navigationController pushViewController:submitOrder animated:YES];
+    }else{
+        [self presentTargetViewController:NSStringFromClass([PCSignInViewController class])];
+    }
+    
+}
+
+- (void)panToPopView{
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(pan:)];
+    [self.view addGestureRecognizer:pan];
+}
+
+- (void)pan:(UIPanGestureRecognizer *)pan{
+    CGPoint startPoint;
+    CGPoint changedPoint;
+    CGPoint velocity = [pan velocityInView:self.view];
+    if(velocity.x>0) {
+        if(pan.state == UIGestureRecognizerStateBegan){
+            startPoint = [pan locationInView:self.view];
+        }
+        if (pan.state ==UIGestureRecognizerStateChanged){
+            changedPoint = [pan locationInView:self.view];
+            if((changedPoint.x-startPoint.x)>60){
+                [self.navigationController popViewControllerAnimated:YES];
+            }
+        }
+    }
+}
+
+- (void) shareBlcakBgViewTaped {
+    
+}
+
+- (void)shareCustomShareBtnClicked {
+    
+}
+
+-(void)popMenuDidClickRefresh:(fullPageFailLoadView *)popMenu{
+   
+    
+    [popMenu.fullfailLoad hideTheSubViews];
+//    [self load];
+}
+
+- (void)presentTargetViewController:(NSString *)classStr{
+    id targetVC = [[NSClassFromString(classStr) alloc] init];
+    UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:targetVC];
+    [self presentViewController:nav animated:NO completion:nil];
+}
+
+
+@end

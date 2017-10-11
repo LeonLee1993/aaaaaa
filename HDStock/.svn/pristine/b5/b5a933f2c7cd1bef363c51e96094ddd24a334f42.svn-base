@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11201" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="HDLiveAskQuestionTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="65"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <frame key="frameInset" width="320" height="64"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="明天大盘会涨还是跌" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gUv-7x-zlz">
+                        <constraints>
+                            <constraint firstAttribute="height" constant="18" id="lEe-yc-qVq"/>
+                            <constraint firstAttribute="width" constant="216" id="oml-K5-g5K"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="已回答" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sfp-PO-TbS">
+                        <constraints>
+                            <constraint firstAttribute="width" constant="34" id="Drr-lc-N2b"/>
+                            <constraint firstAttribute="height" constant="21" id="JNS-mj-OeW"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                        <color key="textColor" red="0.82745098039215681" green="0.29411764705882354" blue="0.15294117647058825" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="提问者：" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y7s-eO-QZK">
+                        <constraints>
+                            <constraint firstAttribute="height" constant="10" id="HIN-vW-k1A"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                        <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="y7s-eO-QZK" firstAttribute="top" secondItem="gUv-7x-zlz" secondAttribute="bottom" constant="10" id="229-ZD-aRd"/>
+                    <constraint firstItem="gUv-7x-zlz" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="3on-7a-wmj"/>
+                    <constraint firstItem="sfp-PO-TbS" firstAttribute="centerY" secondItem="gUv-7x-zlz" secondAttribute="centerY" id="F3c-gi-6YU"/>
+                    <constraint firstAttribute="trailing" secondItem="sfp-PO-TbS" secondAttribute="trailing" constant="21" id="Khq-WQ-ESB"/>
+                    <constraint firstItem="gUv-7x-zlz" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="21" id="WgD-bU-ghL"/>
+                    <constraint firstItem="y7s-eO-QZK" firstAttribute="leading" secondItem="gUv-7x-zlz" secondAttribute="leading" id="gyR-fk-oxd"/>
+                    <constraint firstItem="y7s-eO-QZK" firstAttribute="width" secondItem="gUv-7x-zlz" secondAttribute="width" id="v3C-3i-hMg"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="answerStatusLabl" destination="sfp-PO-TbS" id="sSL-Kk-H0h"/>
+                <outlet property="askerLabl" destination="y7s-eO-QZK" id="D0g-1D-Qix"/>
+                <outlet property="questionTitleLab" destination="gUv-7x-zlz" id="uRg-kn-3UV"/>
+            </connections>
+            <point key="canvasLocation" x="76" y="53.5"/>
+        </tableViewCell>
+    </objects>
+</document>

@@ -1,0 +1,180 @@
+//
+//  PersonalproductViewController.m
+//  HDStock
+//
+//  Created by liyancheng on 16/11/29.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "PersonalproductViewController.h"
+#import "PersonalProductTableViewCell.h"//产品cell//裸115
+#import "ProductDetailViewController.h"
+#import "buiedProductListViewController.h"
+
+@interface PersonalproductViewController ()<UITableViewDataSource,UITableViewDelegate>
+
+@end
+
+@implementation PersonalproductViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setHeader:@"我的产品"];
+    [self initScrollView];
+    [self setTableViewsWithCellKindsArray:@[@""]];
+    [self setTableView];
+}
+
+- (void)setTableView{
+    [self.scrollView setFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT-64)];
+    self.scrollView.contentSize = CGSizeMake(SCREEN_WIDTH, SCREEN_HEIGHT-64);
+    self.tableView1.delegate = self;
+    self.tableView1.dataSource = self;
+    self.tableView1.backgroundColor = RGBCOLOR(241, 244, 248);
+    [self.tableView1 registerNib:[UINib nibWithNibName:@"PersonalProductTableViewCell" bundle:nil] forCellReuseIdentifier:@"PersonalProductTableViewCell"];
+    self.tableView1.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-64);
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 4;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(tableView == self.tableView1){
+        PersonalProductTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PersonalProductTableViewCell"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        [self setViewWithCell:cell andIndex:indexPath];
+        return cell;
+    }else{
+        return nil;
+    }
+}
+
+- (void)setViewWithCell:(PersonalProductTableViewCell *)cell andIndex:(NSIndexPath *)indexPath{
+    switch (indexPath.row) {
+        case 0:
+        {
+            cell.image.image = [UIImage imageNamed:@"V6_icon"];
+            cell.title.text = @"V6尊享版";
+            cell.mainImage.image = [UIImage imageNamed:@"V6_pic"];
+            if([cell.stateButton.titleLabel.text isEqualToString:@" 已购买 "]){
+                cell.stateButton.backgroundColor = RGBCOLOR(221,221,221);
+            }
+            cell.scriptLabel.text = @"  VIP尊享版帮您理清市场热点，挖掘潜力龙头，把握大盘方向...";
+        }
+            break;
+        case 1:
+        {
+            cell.image.image = [UIImage imageNamed:@"catchcow_icon"];
+            cell.title.text = @"擒牛";
+            cell.title.textColor = RGBCOLOR(208,60,84);
+            [cell.stateButton setBackgroundColor:RGBCOLOR(208,60,84)];
+            if([cell.stateButton.titleLabel.text isEqualToString:@" 已购买 "]){
+                cell.stateButton.backgroundColor = RGBCOLOR(221,221,221);
+            }
+            cell.mainImage.image = [UIImage imageNamed:@"catchcow_pic"];
+            cell.scriptLabel.text = @"  硝烟四起，烽火连天，股市的战场上神牛狂奔，却总被踩踏。何不...";
+        }
+            break;
+        case 2:
+        {
+            cell.image.image = [UIImage imageNamed:@"catchdragon_icon"];
+            cell.title.text = @"降龙";
+            cell.title.textColor = RGBCOLOR(42,146,189);
+            [cell.stateButton setBackgroundColor:RGBCOLOR(42,146,189)];
+            [cell.stateButton setTitle:@" 购买 " forState:UIControlStateNormal];
+            if([cell.stateButton.titleLabel.text isEqualToString:@" 已购买 "]){
+                cell.stateButton.backgroundColor = RGBCOLOR(221,221,221);
+            }
+            cell.mainImage.image = [UIImage imageNamed:@"catchdragon_pic"];
+            cell.scriptLabel.text = @"  破囚之龙,一飞冲天,，欲获龙头，必拥降龙之利器。共振爆点，直指...";
+        }
+            break;
+        case 3:
+        {
+            cell.image.image = [UIImage imageNamed:@"catchmonster_icon"];
+            cell.title.text = @"捉妖";
+            cell.title.textColor = RGBCOLOR(208,80,41);
+            [cell.stateButton setBackgroundColor:RGBCOLOR(208,80,41)];
+            if([cell.stateButton.titleLabel.text isEqualToString:@" 已购买 "]){
+                cell.stateButton.backgroundColor = RGBCOLOR(221,221,221);
+            }
+            cell.mainImage.image = [UIImage imageNamed:@"catchmonster_pic"];
+            cell.scriptLabel.text = @"  山雄伟，海辽阔，经奇幻。股市风云变幻，妖股横行，妖行千里...";
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+//    NSString * tempStr = @"老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！老师讲得好！";
+    
+    if (tableView == self.tableView1) {
+        return 195*SCREEN_WIDTH/375;
+        
+    }else{
+        return 0;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    PersonalProductTableViewCell *cellofIndex = [tableView cellForRowAtIndexPath:indexPath];
+    if( [cellofIndex.stateButton.titleLabel.text isEqualToString:@" 已购买 "]){
+        buiedProductListViewController *list = [[buiedProductListViewController alloc]init];
+        switch (indexPath.row) {
+            case 0:
+                list.flagStr = @"0";
+                break;
+            case 1:
+                list.flagStr = @"1";
+                break;
+            case 2:
+                list.flagStr = @"2";
+                break;
+            case 3:
+                list.flagStr = @"3";
+                break;
+                
+            default:
+                break;
+        }
+        [self.navigationController pushViewController:list animated:YES];
+    }else{
+        ProductDetailViewController *PDVC = [[ProductDetailViewController alloc]init];
+        switch (indexPath.row) {
+            case 0:
+                PDVC.title = @"X6尊享版";
+                PDVC.urlStr = @"http://gk.cdtzb.com/api/product/x6";
+                PDVC.priceStr = @"998";
+                break;
+            case 1:
+                PDVC.title = @"擒牛";
+                PDVC.urlStr = @"http://gk.cdtzb.com/api/product/qn";
+                PDVC.priceStr = @"1998";
+                break;
+            case 2:
+                PDVC.title = @"降龙";
+                PDVC.urlStr = @"http://gk.cdtzb.com/api/product/xl";
+                PDVC.priceStr = @"3998";
+                break;
+            case 3:
+                PDVC.title = @"捉妖";
+                PDVC.urlStr = @"http://gk.cdtzb.com/api/product/zy";
+                PDVC.priceStr = @"5998";
+                break;
+                
+            default:
+                break;
+        }
+        
+        
+        [self.navigationController pushViewController:PDVC animated:YES];
+    }
+    
+}
+
+
+@end

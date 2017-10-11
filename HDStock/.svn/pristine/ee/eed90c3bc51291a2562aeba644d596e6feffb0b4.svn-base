@@ -1,0 +1,444 @@
+//
+//  HDSearchCenterViewController.m
+//  HDStock
+//
+//  Created by hd-app02 on 16/11/14.
+//  Copyright © 2016年 hd-app02. All rights reserved.
+//
+
+#import "HDSearchCenterViewController.h"
+#import "HDMarketSearchTF.h"
+#import "HDSearchTableViewCell.h"
+#import "HDSearchViewModel.h"
+#import "DeleteHistoryTableViewCell.h"
+#import "HDMarketDetailViewController.h"
+
+#define realWidth [[UIScreen mainScreen] bounds].size.width
+#define realHeight [[UIScreen mainScreen] bounds].size.height
+@interface HDSearchCenterViewController ()<UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource>
+@property (nonatomic,strong)HDMarketSearchTF *HDsearchTextFd;
+@property (nonatomic,strong)NSMutableArray *historyArr;//搜索历史数组 (用于得到沙盒数据)
+@property (nonatomic,strong)NSMutableArray *realHistoryArr;//可变数组
+@property (nonatomic,strong)NSMutableArray *archArr; //要存进沙盒的array
+@property (nonatomic,strong)UITableView * tableView;
+@property (nonatomic,strong)NSMutableArray *searchResultArr;//从链接下载下来的数据
+@property (nonatomic,strong)NSMutableArray *searchingArr;//与搜索框匹配的历史
+@end
+
+@implementation HDSearchCenterViewController{
+    BOOL _hasTextFlag;//文本框是否输入内容
+    UILabel *titleLable;
+}
+
+-(NSMutableArray *)searchResultArr{
+    if(!_searchResultArr){
+        _searchResultArr = @[].mutableCopy;
+    }
+    return _searchResultArr;
+}
+
+
+-(NSMutableArray *)searchingArr{
+    if(!_searchingArr){
+        _searchingArr = @[].mutableCopy;
+    }
+    return _searchingArr;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setTopView];
+    [self setUpTableView];
+    [self requestData];
+    _hasTextFlag = NO;
+    NSLog(@"%@",NSHomeDirectory());
+}
+
+
+- (void)tempModel{
+    if(!_historyArr)
+    {
+        _realHistoryArr = [[NSMutableArray alloc]init];
+        _historyArr = [[NSMutableArray alloc]init];
+        _archArr = [[NSMutableArray alloc]init];
+        [_realHistoryArr removeAllObjects];
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"historySearch"] isKindOfClass:[NSArray class]]){
+            _historyArr = [[NSUserDefaults standardUserDefaults] objectForKey:@"historySearch"];
+            for (NSDictionary *dic in _historyArr) {
+                HDSearchViewModel *model = [HDSearchViewModel yy_modelWithDictionary:dic];
+                [_realHistoryArr addObject: model];
+            }
+        }else{
+           [[NSUserDefaults standardUserDefaults] setObject:_historyArr forKey:@"historySearch"];
+        }
+    }else{
+        [_realHistoryArr removeAllObjects];
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"historySearch"] isKindOfClass:[NSArray class]]){
+            _historyArr = [[NSUserDefaults standardUserDefaults] objectForKey:@"historySearch"];
+            for (NSDictionary *dic in _historyArr) {
+                HDSearchViewModel *model = [HDSearchViewModel yy_modelWithDictionary:dic];
+                [_realHistoryArr addObject: model];
+            }
+        }else{
+            [[NSUserDefaults standardUserDefaults] setObject:_historyArr forKey:@"historySearch"];
+        }
+    }
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField{
+    if([textField.text isEqualToString:@""]){
+        return NO;
+    }else{
+        HDSearchViewModel *model = _searchingArr[0];
+        if([_realHistoryArr containsObject:model]){
+            //包含时不添加
+        }else{
+            //不包含时添加
+            if(model!=nil){
+                [_realHistoryArr addObject:model];
+            }
+            [_archArr removeAllObjects];
+            for (HDSearchViewModel *model in _realHistoryArr) {
+                NSMutableDictionary * dic = [[NSMutableDictionary alloc]init];
+                [dic setObject:model.Symbol forKey:@"Symbol"];
+                [dic setObject:model.Name forKey:@"Name"];
+                [_archArr addObject:dic];
+            }
+            [[NSUserDefaults standardUserDefaults] setObject:_archArr forKey:@"historySearch"];
+        }
+        HDMarketDetailViewController *detail = [[HDMarketDetailViewController alloc]init];
+        detail.codeStr = model.Symbol;
+        detail.title = model.Name;
+        [self.navigationController pushViewController:detail animated:YES];
+        return YES;
+    }
+}
+
+-(void)setUpTableView{
+    _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, realWidth, realHeight-64)];
+    _tableView.backgroundColor = BACKGROUNDCOKOR;
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [_tableView registerNib:[UINib nibWithNibName:@"HDSearchTableViewCell" bundle:nil] forCellReuseIdentifier:@"HDSearchTableViewCell"];
+    [_tableView registerNib:[UINib nibWithNibName:@"DeleteHistoryTableViewCell" bundle:nil] forCellReuseIdentifier:@"DeleteHistoryTableViewCell"];
+    [self.view addSubview:_tableView];
+    [_tableView reloadData];
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    [self tempModel];
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [self.navigationController setNavigationBarHidden:NO];
+}
+
+- (void)setTopView{
+    UIView *topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, realWidth, 20)];
+    [self.view addSubview:topView];
+    topView.backgroundColor = RGBCOLOR(26, 120, 200);
+    
+    UIView *topSearchView = [[UIView alloc]initWithFrame:CGRectMake(0, 20, realWidth, 44)];
+    [self.view addSubview:topSearchView];
+    topSearchView.backgroundColor = RGBCOLOR(26, 120, 200);
+    self.HDsearchTextFd = [[HDMarketSearchTF alloc]initWithFrame:CGRectMake(15, 7,self.view.frame.size.width-70,30)];
+    self.HDsearchTextFd.placeholder = @"股票代码/全拼音/首字母";
+    self.HDsearchTextFd.delegate = self;
+    self.HDsearchTextFd.clearButtonMode = UITextFieldViewModeWhileEditing;
+    self.HDsearchTextFd.layer.cornerRadius=6;
+    self.HDsearchTextFd.layer.masksToBounds = YES;
+    self.HDsearchTextFd.keyboardType = UIKeyboardTypeWebSearch;
+    self.HDsearchTextFd.backgroundColor = BACKGROUNDCOKOR;
+    UIImageView *img = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"sousuo"]];
+    img.frame = CGRectMake(10, 0,13,14);
+    self.HDsearchTextFd.textColor = UICOLOR(153, 153, 153, 1);
+    self.HDsearchTextFd.leftView = img;
+    self.HDsearchTextFd.leftViewMode = UITextFieldViewModeAlways;
+    self.HDsearchTextFd.font = [UIFont fontWithName:@"Arial" size:13];
+    self.HDsearchTextFd.tintColor = [UIColor grayColor];
+    [topSearchView addSubview:self.HDsearchTextFd];
+    UIButton *cancelBRT = [[UIButton alloc]initWithFrame:CGRectMake(realWidth-45, 5, 30, 15)];
+    [cancelBRT setTitle:@"取消" forState:UIControlStateNormal];
+    cancelBRT.tintColor = [UIColor whiteColor];
+    cancelBRT.titleLabel.font = [UIFont systemFontOfSize:15];
+    [cancelBRT sizeToFit];
+    [cancelBRT addTarget:self action:@selector(backTo) forControlEvents:UIControlEventTouchUpInside];
+    [topSearchView addSubview:cancelBRT];
+  
+    [self.HDsearchTextFd addTarget:self action:@selector(textField1TextChange:) forControlEvents:UIControlEventEditingChanged];
+}
+
+-(void)textField1TextChange:(UITextField *)textField{
+    
+    if(textField.text.length>0){
+        [self searchAction:textField.text];
+    }else{
+        _hasTextFlag = NO;
+        [_tableView reloadData];
+    }
+}
+
+- (void)backTo{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+
+#pragma mark -----tableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    //搜索文字框有字的时候
+    if(_hasTextFlag){
+        return _searchingArr.count;
+    }
+    //历史记录的时候
+    else{
+        if(section==0){
+            return _realHistoryArr.count;
+        }
+        else if (section==1){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    //搜索文字框有字的时候
+    if(_hasTextFlag){
+        HDSearchTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"HDSearchTableViewCell"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.model = _searchingArr[indexPath.row];
+        cell.addBlock = ^(NSString * symbol){
+            NSMutableArray * mutArr ;
+            if([[LYCUserManager informationDefaultUser].defaultUser objectForKey:MarketSearchDataKey]){
+                mutArr = [NSMutableArray arrayWithArray:[[LYCUserManager informationDefaultUser].defaultUser objectForKey:MarketSearchDataKey]];
+                if([mutArr containsObject:symbol]){
+                    [mutArr removeObject:symbol];
+                }else{
+                    [mutArr addObject:symbol];
+                }
+                [[LYCUserManager informationDefaultUser].defaultUser setObject:mutArr forKey:MarketSearchDataKey];
+                [_tableView reloadData];
+            }else{
+                mutArr = @[].mutableCopy;
+                [mutArr addObject:symbol];
+                [[LYCUserManager informationDefaultUser].defaultUser setObject:mutArr forKey:MarketSearchDataKey];
+                [_tableView reloadData];
+            }
+        };
+        return cell;
+    }
+    //历史记录的时候
+    else{
+        if(indexPath.section == 0){
+            HDSearchTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"HDSearchTableViewCell"];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.model = _realHistoryArr[indexPath.row];
+            cell.addBlock = ^(NSString *symbol){
+                NSMutableArray * mutArr ;
+                if([[LYCUserManager informationDefaultUser].defaultUser objectForKey:MarketSearchDataKey]){
+                    mutArr = [NSMutableArray arrayWithArray:[[LYCUserManager informationDefaultUser].defaultUser objectForKey:MarketSearchDataKey]];
+                    if([mutArr containsObject:symbol]){
+                        [mutArr removeObject:symbol];
+                    }else{
+                        [mutArr addObject:symbol];
+                    }
+                    [[LYCUserManager informationDefaultUser].defaultUser setObject:mutArr forKey:MarketSearchDataKey];
+                }else{
+                    mutArr = @[].mutableCopy;
+                    [mutArr addObject:symbol];
+                    [[LYCUserManager informationDefaultUser].defaultUser setObject:mutArr forKey:MarketSearchDataKey];
+                }
+            };
+            return cell;
+        }else if (indexPath.section ==1){
+            DeleteHistoryTableViewCell *deleteCell = [tableView dequeueReusableCellWithIdentifier:@"DeleteHistoryTableViewCell"];
+            deleteCell.selectionStyle = UITableViewCellSelectionStyleNone;
+            return deleteCell;
+        }else{
+            return nil;
+        }
+    }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    if(section==0){
+        return 43;
+    }else{
+        return 0;
+    }
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    
+    if(section ==0){
+        UIView * tableHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, realWidth, 43)];
+        tableHeadView.backgroundColor = BACKGROUNDCOKOR;
+        titleLable = [[UILabel alloc]initWithFrame:CGRectMake(20, 15, 100, 13)];
+        titleLable.textColor = UICOLOR(102, 102, 102, 1);
+        titleLable.font = [UIFont systemFontOfSize:13];
+        if(_hasTextFlag){
+            titleLable.text = @"搜索结果";
+        }else{
+            titleLable.text = @"搜索历史";
+        }
+        titleLable.textAlignment = NSTextAlignmentLeft;
+        [tableHeadView addSubview:titleLable];
+        return tableHeadView;
+    }else{
+        return nil;
+    }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(indexPath.section ==0){
+        return 60;
+    }
+    else if (indexPath.section ==1){
+        return 43;
+    }
+    else{
+        return 0;
+    }
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    //搜索文字框有字的时候
+    if(_hasTextFlag){
+        return 1;
+    }
+    //历史记录的时候
+    else{
+        if(_realHistoryArr.count>0){
+            return 2;
+        }else{
+            return 1;
+        }
+    }
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(indexPath.section ==0){
+        HDMarketDetailViewController *detailVC = [[HDMarketDetailViewController alloc]init];
+        UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStyleDone target:nil action:nil];
+        self.navigationItem.backBarButtonItem = barButtonItem;
+
+        HDSearchViewModel * model = _searchingArr[indexPath.row];
+        if([_realHistoryArr containsObject:model]){
+            //包含时不添加
+        }else{
+            //不包含时添加
+            if(model!=nil){
+                [_realHistoryArr addObject:model];
+            }
+            [_archArr removeAllObjects];
+            for (HDSearchViewModel *model in _realHistoryArr) {
+                NSMutableDictionary * dic = [[NSMutableDictionary alloc]init];
+                [dic setObject:model.Symbol forKey:@"Symbol"];
+                [dic setObject:model.Name forKey:@"Name"];
+                [_archArr addObject:dic];
+            }
+            [[NSUserDefaults standardUserDefaults] setObject:_archArr forKey:@"historySearch"];
+        }
+        detailVC.title = model.Name;
+        [self.navigationController pushViewController:detailVC animated:YES];
+    }else if (indexPath.section ==1){
+        
+        UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"提示" message:@"确定清除所有历史记录?" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction * okAction = [UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [_realHistoryArr removeAllObjects];
+            [[NSUserDefaults standardUserDefaults] setObject:_realHistoryArr forKey:@"historySearch"];
+            [_tableView reloadData];
+        }];
+        
+        UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            
+        }];
+        
+        [alert addAction:okAction];
+        [alert addAction:cancelAction];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+}
+
+- (void)searchAction:(NSString *) searchingStr{
+    _hasTextFlag = YES;
+    if(!_searchingArr){
+        _searchingArr = @[].mutableCopy;
+    }
+    [_searchingArr removeAllObjects];
+    for (HDSearchViewModel *model in _searchResultArr) {
+        if ([[(NSString *)model.Symbol lowercaseString] rangeOfString:[(NSString *)searchingStr lowercaseString]].location == NSNotFound) {
+           
+        } else {
+            if([_searchingArr containsObject:model]){
+                
+            }else{
+                [_searchingArr addObject:model];
+            }
+        }
+        
+        if ([[(NSString *)model.Name lowercaseString] rangeOfString:[(NSString *)searchingStr lowercaseString]].location == NSNotFound) {
+            
+        } else {
+            if([_searchingArr containsObject:model]){
+                
+            }else{
+                [_searchingArr addObject:model];
+            }
+        }
+    }
+    [_tableView reloadData];
+}
+
+#pragma mark - 网络请求
+- (void)requestData{
+    
+    NSString * url = @"http://db2015.wstock.cn/wsDB_API/stock.php?return_t=0&r_type=2&market=SH&u=test&p=8e6a";
+    
+    WEAK_SELF;
+        
+    STRONG_SELF;
+    
+    [[CDAFNetWork sharedMyManager]get:url params:nil success:^(id json) {
+        NSArray * dataArr = json;
+        if(dataArr.count>10){
+            if (self.searchResultArr.count != 0) {
+                
+                [self.searchResultArr removeAllObjects];
+                
+            }
+
+            
+            for (NSDictionary * dic in dataArr) {
+                
+                HDSearchViewModel * model = [HDSearchViewModel yy_modelWithDictionary:dic];
+                
+                [strongSelf.searchResultArr addObject:model];
+                
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                [strongSelf.tableView reloadData];
+                
+            });
+        }
+        
+    } failure:^(NSError *error) {
+        
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.mode = MBProgressHUDModeText;
+        hud.label.text = @"数据请求错误";
+        [hud hideAnimated:YES afterDelay: 2];
+        
+    }];
+}
+
+
+@end
