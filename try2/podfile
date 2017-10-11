@@ -1,0 +1,5 @@
+platform:ios,'8.0'
+target 'try2' do
+pod 'MBProgressHUD'
+end
+
